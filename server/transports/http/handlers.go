@@ -9,6 +9,6 @@ import (
 func NewHttpHandler(r *gin.Engine, eps endpoints.Endpoints) *gin.Engine {
 
 	// Create an account group
-	handlers.MakeUserHandler(eps.RoleEndpoint, r.Group("/user"))
+	handlers.MakeUserHandler(eps.RoleEndpoint, r.Group("/v1/role"))
 	return r
 }
