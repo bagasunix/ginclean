@@ -1,8 +1,8 @@
 package inits
 
 import (
-	"github.com/bagasunix/ginclean/domains"
-	"github.com/bagasunix/ginclean/endpoints"
+	"github.com/bagasunix/ginclean/server/domains"
+	"github.com/bagasunix/ginclean/server/endpoints"
 )
 
 func InitEndpoints(svc domains.Service) endpoints.Endpoints {

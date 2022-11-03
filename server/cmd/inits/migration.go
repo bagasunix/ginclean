@@ -1,8 +1,8 @@
 package inits
 
 import (
-	"github.com/bagasunix/ginclean/domains/data/models"
 	"github.com/bagasunix/ginclean/pkg/errors"
+	"github.com/bagasunix/ginclean/server/domains/data/models"
 	"gorm.io/gorm"
 )
 

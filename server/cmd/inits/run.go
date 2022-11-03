@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bagasunix/ginclean/domains/data/repositories"
 	envs "github.com/bagasunix/ginclean/pkg/env"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories"
 )
 
 var (
