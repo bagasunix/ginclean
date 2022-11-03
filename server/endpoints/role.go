@@ -1,6 +1,8 @@
 package endpoints
 
 import (
+	"context"
+
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/gin-gonic/gin"
@@ -30,23 +32,35 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 }
 
 // DeleteRole implements RoleEndpoint
-func (*roleHandler) DeleteRole() gin.HandlerFunc {
-	panic("unimplemented")
+func (r *roleHandler) DeleteRole() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req requests.EntityId
+		r.service.DeleteRole(ctx, &req)
+	}
 }
 
 // ListRole implements RoleEndpoint
-func (*roleHandler) ListRole() gin.HandlerFunc {
-	panic("unimplemented")
+func (r *roleHandler) ListRole() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req requests.BaseList
+		r.service.ListRole(ctx, &req)
+	}
 }
 
 // UpdateRole implements RoleEndpoint
-func (*roleHandler) UpdateRole() gin.HandlerFunc {
-	panic("unimplemented")
+func (r *roleHandler) UpdateRole() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req requests.UpdateRole
+		r.service.UpdateRole(context.Background(), &req)
+	}
 }
 
 // ViewRole implements RoleEndpoint
-func (*roleHandler) ViewRole() gin.HandlerFunc {
-	panic("unimplemented")
+func (r *roleHandler) ViewRole() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req requests.EntityId
+		r.service.ViewRole(ctx, &req)
+	}
 }
 
 func NewRoleEndpoint(svc domains.Service) RoleEndpoint {
