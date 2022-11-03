@@ -2,10 +2,20 @@ package endpoints
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	CREATE_ROLE = "CreateRole"
+	UPDATE_ROLE = "UpdateRole"
+	DELETE_ROLE = "DeleteRole"
+	LIST_ROLE   = "ListRole"
+	VIEW_ROLE   = "ViewRole"
 )
 
 type RoleEndpoint interface {
@@ -25,9 +35,16 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		var req requests.CreateRole
 		if err := g.Bind(&req); err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		r.service.CreateRole(g, &req)
+		dataRole, err := r.service.CreateRole(g.Request.Context(), &req)
+		if err != nil {
+			g.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+		return
 	}
 }
 
