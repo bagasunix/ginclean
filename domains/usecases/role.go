@@ -14,17 +14,19 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type RoleService interface {
-	CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error)
-	ListRole(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Role], err error)
-	ViewRole(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Role], err error)
-	UpdateRole(ctx context.Context, req *requests.UpdateRole) (res *responses.Empty, err error)
-	DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
-}
+type (
+	RoleService interface {
+		CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error)
+		ListRole(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Role], err error)
+		ViewRole(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Role], err error)
+		UpdateRole(ctx context.Context, req *requests.UpdateRole) (res *responses.Empty, err error)
+		DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
+	}
 
-type RoleUseCase struct {
-	repo repositories.Repositories
-}
+	RoleUseCase struct {
+		repo repositories.Repositories
+	}
+)
 
 // DeleteRole implements RoleService
 func (r *RoleUseCase) DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
@@ -112,6 +114,7 @@ func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) 
 	mRole := models.NewRoleBuilder()
 	mRole.SetId(helpers.GenerateUUIDV1())
 	mRole.SetName(req.Name)
+	mRole.SetCreatedAt(time.Now().UTC().Local())
 
 	if err = r.repo.GetRole().Create(ctx, mRole.Build()); err != nil {
 		return resBuild.Build(), err
