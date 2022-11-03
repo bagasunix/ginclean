@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/bagasunix/ginclean/endpoints"
+	"github.com/bagasunix/ginclean/server/endpoints"
 	"github.com/gin-gonic/gin"
 )
 

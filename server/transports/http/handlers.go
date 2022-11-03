@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/bagasunix/ginclean/endpoints"
-	"github.com/bagasunix/ginclean/transports/http/handlers"
+	"github.com/bagasunix/ginclean/server/endpoints"
+	"github.com/bagasunix/ginclean/server/transports/http/handlers"
 	"github.com/gin-gonic/gin"
 )
 
