@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/bagasunix/ginclean/pkg/errors"
@@ -40,7 +39,6 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 		}
 		dataRole, err := r.service.CreateRole(g.Request.Context(), &req)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 		g.JSON(http.StatusOK, dataRole)
@@ -50,33 +48,69 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 
 // DeleteRole implements RoleEndpoint
 func (r *roleHandler) DeleteRole() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(g *gin.Context) {
 		var req requests.EntityId
-		r.service.DeleteRole(ctx, &req)
+		if err := g.Bind(&req); err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			return
+		}
+		dataRole, err := r.service.DeleteRole(g, &req)
+		if err != nil {
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+		return
 	}
 }
 
-// ListRole implements RoleEndpoint
+// ListRole implements RoleEndpointd
 func (r *roleHandler) ListRole() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(g *gin.Context) {
 		var req requests.BaseList
-		r.service.ListRole(ctx, &req)
+		if err := g.Bind(&req); err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			return
+		}
+		dataRole, err := r.service.ListRole(g, &req)
+		if err != nil {
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+		return
 	}
 }
 
 // UpdateRole implements RoleEndpoint
 func (r *roleHandler) UpdateRole() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(g *gin.Context) {
 		var req requests.UpdateRole
-		r.service.UpdateRole(context.Background(), &req)
+		if err := g.Bind(&req); err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			return
+		}
+		dataRole, err := r.service.UpdateRole(g, &req)
+		if err != nil {
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+		return
 	}
 }
 
 // ViewRole implements RoleEndpoint
 func (r *roleHandler) ViewRole() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(g *gin.Context) {
 		var req requests.EntityId
-		r.service.ViewRole(ctx, &req)
+		if err := g.Bind(&req); err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			return
+		}
+		dataRole, err := r.service.ViewRole(g, &req)
+		if err != nil {
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+		return
 	}
 }
 
