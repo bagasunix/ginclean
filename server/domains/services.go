@@ -1,8 +1,8 @@
 package domains
 
 import (
-	"github.com/bagasunix/ginclean/domains/data/repositories"
-	"github.com/bagasunix/ginclean/domains/usecases"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories"
+	"github.com/bagasunix/ginclean/server/domains/usecases"
 )
 
 type Service interface {

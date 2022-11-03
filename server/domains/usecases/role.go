@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/bagasunix/ginclean/domains/data/models"
-	"github.com/bagasunix/ginclean/domains/data/repositories"
-	"github.com/bagasunix/ginclean/domains/entities"
-	"github.com/bagasunix/ginclean/endpoints/requests"
-	"github.com/bagasunix/ginclean/endpoints/responses"
 	"github.com/bagasunix/ginclean/pkg/helpers"
+	"github.com/bagasunix/ginclean/server/domains/data/models"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories"
+	"github.com/bagasunix/ginclean/server/domains/entities"
+	"github.com/bagasunix/ginclean/server/endpoints/requests"
+	"github.com/bagasunix/ginclean/server/endpoints/responses"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gofrs/uuid"
 )
