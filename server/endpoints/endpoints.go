@@ -1,6 +1,13 @@
 package endpoints
 
-import "github.com/bagasunix/ginclean/server/domains"
+import (
+	"context"
+
+	"github.com/bagasunix/ginclean/server/domains"
+)
+
+type Endpoint func(ctx context.Context, req interface{}) (res interface{}, err error)
+type Middleware func(Endpoint) Endpoint
 
 type Endpoints struct {
 	RoleEndpoint RoleEndpoint
@@ -9,6 +16,7 @@ type Endpoints struct {
 // Builder Object for Endpoints
 type EndpointsBuilder struct {
 	service domains.Service
+	mdw     map[string][]Middleware
 }
 
 // Constructor for EndpointsBuilder
@@ -27,4 +35,9 @@ func (b *EndpointsBuilder) Build() *Endpoints {
 // Setter method for the field service of type domains.Service in the object EndpointsBuilder
 func (e *EndpointsBuilder) SetService(service domains.Service) {
 	e.service = service
+}
+
+// Setter method for the field mdw of type map[string][]Middleware in the object EndpointsBuilder
+func (e *EndpointsBuilder) SetMdw(mdw map[string][]Middleware) {
+	e.mdw = mdw
 }
