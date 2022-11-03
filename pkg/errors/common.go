@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // Type holds a type string and integer code for the error
@@ -19,21 +20,22 @@ const (
 	PayloadTooLarge      Type = "PAYLOAD_TOO_LARGE"      // for uploading tons of JSON, or an image over the limit - 413
 	ServiceUnavailable   Type = "SERVICE_UNAVAILABLE"    // For long running handlers
 	UnsupportedMediaType Type = "UNSUPPORTED_MEDIA_TYPE" // for http 415
+	NoContent            Type = "NOCONTENT"
 )
 
 // Error holds a custom error for the application
 // which is helpful in returning a consistent
 // error type/message from API endpoints
 type Error struct {
-	Type    Type   `json:"type"`
-	Message string `json:"message"`
+	Type    Type `json:"type"`
+	Message any  `json:"message"`
 }
 
 // Error satisfies standard error interface
 // we can return errors from this package as
 // a regular old go _error_
 func (e *Error) Error() string {
-	return e.Message
+	return e.Message.(string)
 }
 
 // Status is a mapping errors to status codes
@@ -57,6 +59,8 @@ func (e *Error) Status() int {
 		return http.StatusServiceUnavailable
 	case UnsupportedMediaType:
 		return http.StatusUnsupportedMediaType
+	case NoContent:
+		return http.StatusNoContent
 	default:
 		return http.StatusInternalServerError
 	}
@@ -78,7 +82,7 @@ func Status(err error) int {
  */
 
 // NewAuthorization to create a 401
-func NewAuthorization(reason string) *Error {
+func NewAuthorization(reason any) *Error {
 	return &Error{
 		Type:    Authorization,
 		Message: reason,
@@ -86,7 +90,7 @@ func NewAuthorization(reason string) *Error {
 }
 
 // NewBadRequest to create 400 errors (validation, for example)
-func NewBadRequest(reason string) *Error {
+func NewBadRequest(reason any) *Error {
 	return &Error{
 		Type:    BadRequest,
 		Message: fmt.Sprintf("Bad request. Reason: %v", reason),
@@ -94,7 +98,7 @@ func NewBadRequest(reason string) *Error {
 }
 
 // NewConflict to create an error for 409
-func NewConflict(name string, value string) *Error {
+func NewConflict(name string, value any) *Error {
 	return &Error{
 		Type:    Conflict,
 		Message: fmt.Sprintf("resource: %v with value: %v already exists", name, value),
@@ -110,7 +114,7 @@ func NewInternal() *Error {
 }
 
 // NewNotFound to create an error for 404
-func NewNotFound(name string, value string) *Error {
+func NewNotFound(name string, value any) *Error {
 	return &Error{
 		Type:    NotFound,
 		Message: fmt.Sprintf("resource: %v with value: %v not found", name, value),
@@ -134,9 +138,24 @@ func NewServiceUnavailable() *Error {
 }
 
 // NewUnsupportedMediaType to create an error for 415
-func NewUnsupportedMediaType(reason string) *Error {
+func NewUnsupportedMediaType(reason any) *Error {
 	return &Error{
 		Type:    UnsupportedMediaType,
 		Message: reason,
 	}
+}
+
+// NewDuplicate to create an error
+func NewDuplicate(entity string, err error) *Error {
+	if strings.Contains(strings.ToLower(err.Error()), ERR_DUPLICATE_KEY) {
+		return &Error{Type: Conflict, Message: fmt.Sprint(entity, " ", ERR_ALREADY_EXISTS)}
+	}
+	return nil
+}
+
+func NotError(err error) error {
+	if err == nil {
+		return err
+	}
+	return errors.New(ERR_SOMETHING_WRONG)
 }
