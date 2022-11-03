@@ -3,7 +3,7 @@ package account
 import (
 	"context"
 
-	"github.com/bagasunix/ginclean/domains/data/models"
+	"github.com/bagasunix/ginclean/server/domains/data/models"
 	"gorm.io/gorm"
 )
 

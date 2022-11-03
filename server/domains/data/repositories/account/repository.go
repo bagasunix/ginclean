@@ -3,8 +3,8 @@ package account
 import (
 	"context"
 
-	"github.com/bagasunix/ginclean/domains/data/models"
-	"github.com/bagasunix/ginclean/domains/data/repositories/base"
+	"github.com/bagasunix/ginclean/server/domains/data/models"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories/base"
 )
 
 type Command interface {

@@ -3,8 +3,8 @@ package role
 import (
 	"context"
 
-	"github.com/bagasunix/ginclean/domains/data/models"
-	"github.com/bagasunix/ginclean/domains/data/repositories/base"
+	"github.com/bagasunix/ginclean/server/domains/data/models"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories/base"
 	"github.com/gofrs/uuid"
 )
 

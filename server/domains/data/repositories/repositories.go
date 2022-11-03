@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/bagasunix/ginclean/domains/data/repositories/role"
+	"github.com/bagasunix/ginclean/server/domains/data/repositories/role"
 	"gorm.io/gorm"
 )
 
