@@ -32,7 +32,7 @@ func ErrDuplicateValue(entity string, err error) error {
 	if strings.Contains(strings.ToLower(err.Error()), ERR_DUPLICATE_KEY) {
 		return errors.New(fmt.Sprint(entity, " ", ERR_ALREADY_EXISTS))
 	}
-	return nil
+	return ErrSomethingWrong(err)
 }
 
 func ErrSomethingWrong(err error) error {
