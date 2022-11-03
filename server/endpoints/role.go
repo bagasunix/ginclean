@@ -1,8 +1,8 @@
 package endpoints
 
 import (
-	"github.com/bagasunix/ginclean/domains"
-	"github.com/bagasunix/ginclean/endpoints/requests"
+	"github.com/bagasunix/ginclean/server/domains"
+	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/gin-gonic/gin"
 )
 

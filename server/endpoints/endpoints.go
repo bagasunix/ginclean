@@ -1,8 +1,6 @@
 package endpoints
 
-import (
-	"github.com/bagasunix/ginclean/domains"
-)
+import "github.com/bagasunix/ginclean/server/domains"
 
 type Endpoints struct {
 	RoleEndpoint RoleEndpoint
