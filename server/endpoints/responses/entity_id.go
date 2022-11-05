@@ -10,11 +10,6 @@ type EntityId struct {
 	Id any `json:"id"`
 }
 
-// Error implements error
-func (EntityId) Error() string {
-	panic("unimplemented")
-}
-
 func (c *EntityId) ToJSON() []byte {
 	j, err := json.Marshal(c)
 	errors.HandlerReturnedVoid(err)
