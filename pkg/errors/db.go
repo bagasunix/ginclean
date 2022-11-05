@@ -32,6 +32,9 @@ func ErrRecordNotFound(entity string, err error) error {
 }
 
 func ErrDuplicateValue(entity string, err error) error {
+	if err == nil {
+		return err
+	}
 	if strings.Contains(strings.ToLower(err.Error()), ERR_DUPLICATE_KEY) {
 		return errors.New(fmt.Sprint(entity, " ", ERR_ALREADY_EXISTS))
 	}
