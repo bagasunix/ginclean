@@ -22,10 +22,13 @@ func CustomError(err string) error {
 }
 
 func ErrRecordNotFound(entity string, err error) error {
+	if err == nil {
+		return err
+	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New(fmt.Sprint(entity, " ", ERR_NOT_FOUND))
 	}
-	return nil
+	return ErrSomethingWrong(err)
 }
 
 func ErrDuplicateValue(entity string, err error) error {
