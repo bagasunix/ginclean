@@ -70,11 +70,12 @@ func (r *roleHandler) ListRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		req, err := decodeBaseListEndpoint(g)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		dataRole, err := r.service.ListRole(g, req.(*requests.BaseList))
 		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		g.JSON(http.StatusOK, dataRole)
