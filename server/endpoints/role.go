@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bagasunix/ginclean/pkg/errors"
@@ -87,15 +86,15 @@ func (r *roleHandler) UpdateRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		req, err := utils.DecodeByUpdateRoleEndpoint(g)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		// var dataRole *requests.Empty
-		if _, err := r.service.UpdateRole(g, req.(*requests.UpdateRole)); err != nil {
-			g.JSON(http.StatusConflict, errors.NewConflict(fmt.Sprint(req.(*requests.UpdateRole).Name), err))
+		dataRole, err := r.service.UpdateRole(g, req.(*requests.UpdateRole))
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		g.JSON(http.StatusOK, gin.H{})
+		g.JSON(http.StatusOK, dataRole)
 	}
 }
 
@@ -104,12 +103,12 @@ func (r *roleHandler) ViewRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		req, err := decodeByEntityIdEndpoint(g)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		dataRole, err := r.service.ViewRole(g, req.(*requests.EntityId))
 		if err != nil {
-			g.JSON(http.StatusNotFound, errors.NewNotFound(fmt.Sprintf("%v", req.(*requests.EntityId)), err))
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
 		g.JSON(http.StatusOK, dataRole)
