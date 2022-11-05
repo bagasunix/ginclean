@@ -33,6 +33,11 @@ func (r *RoleUseCase) DeleteRole(ctx context.Context, req *requests.EntityId) (r
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
+
+	result := r.repo.GetRole().GetById(ctx, req.Id.(uuid.UUID))
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return new(responses.Empty), r.repo.GetRole().Delete(ctx, req.Id.(uuid.UUID))
 }
 
@@ -41,7 +46,10 @@ func (r *RoleUseCase) UpdateRole(ctx context.Context, req *requests.UpdateRole) 
 	if err = req.Validate(); err != nil {
 		return nil, err
 	}
-
+	result := r.repo.GetRole().GetById(ctx, req.Id.(uuid.UUID))
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	mBuild := models.NewRoleBuilder()
 	mBuild.SetId(req.Id.(uuid.UUID))
 	mBuild.SetName(req.Name)
