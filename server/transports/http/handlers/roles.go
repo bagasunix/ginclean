@@ -12,6 +12,7 @@ func MakeUserHandler(eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.Route
 	rg.GET("", eps.ListRole())
 	rg.GET("/:id", eps.ViewRole())
 	rg.PATCH("/:id", eps.UpdateRole())
+	rg.PATCH("/update-multiple-role", eps.UpdateMultiRole())
 	rg.DELETE("/:id", eps.DeleteRole())
 	return rg
 }
