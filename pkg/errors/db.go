@@ -15,6 +15,7 @@ const (
 	ERR_ALREADY_EXISTS  = "is already exists"
 	ERR_INVALID_KEY     = "invalid"
 	ERR_NOT_AUTHORIZED  = "unauthorized"
+	ERR_UNMARSHAL       = "cannot unmarshal"
 )
 
 func CustomError(err string) error {
