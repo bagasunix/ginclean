@@ -14,19 +14,63 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type (
-	RoleService interface {
-		CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error)
-		ListRole(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Role], err error)
-		ViewRole(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Role], err error)
-		UpdateRole(ctx context.Context, req *requests.UpdateRole) (res *responses.Empty, err error)
-		DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
-	}
+type RoleService interface {
+	CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error)
+	ListRole(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Role], err error)
+	ViewRole(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Role], err error)
+	UpdateRole(ctx context.Context, req *requests.UpdateRole) (res *responses.Empty, err error)
+	UpdateMultipleRole(ctx context.Context, req *[]requests.UpdateRole) (res *responses.ListMultiple[requests.UpdateRole, requests.UpdateRole], err error)
+	DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
+}
 
-	RoleUseCase struct {
-		repo repositories.Repositories
+type RoleUseCase struct {
+	repo repositories.Repositories
+}
+
+// UpdateMultipleRole implements RoleService
+func (r *RoleUseCase) UpdateMultipleRole(ctx context.Context, req *[]requests.UpdateRole) (res *responses.ListMultiple[requests.UpdateRole, requests.UpdateRole], err error) {
+	var (
+		dataFailed, dataSuccess []requests.UpdateRole
+		counterFail             int = 0
+	)
+
+	resBuilder := responses.NewListMultipleBuilder[requests.UpdateRole, requests.UpdateRole]()
+	for _, v := range *req {
+		if err = v.Validate(); err != nil {
+			// return nil, err
+			continue
+
+		}
+		uuID := uuid.Must(uuid.FromString(v.Id.(string)))
+
+		result := r.repo.GetRole().GetById(ctx, uuID)
+		if result.Error != nil {
+			counterFail += 1
+			dataFailed = append(dataFailed, v)
+			// return nil, result.Error
+			continue
+
+		}
+
+		mBuild := models.NewRoleBuilder()
+		mBuild.SetId(uuID)
+		mBuild.SetName(v.Name)
+		mBuild.SetUpdatedAt(time.Now())
+
+		if err := r.repo.GetRole().Update(ctx, mBuild.Build()); err != nil {
+			counterFail += 1
+			dataFailed = append(dataFailed, v)
+			// return nil, result.Error
+			continue
+
+		}
+
+		dataSuccess = append(dataSuccess, v)
 	}
-)
+	resBuilder.SetDataMulti(dataSuccess, dataFailed)
+	return resBuilder.Build(), err
+
+}
 
 // DeleteRole implements RoleService
 func (r *RoleUseCase) DeleteRole(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
