@@ -23,11 +23,29 @@ type RoleEndpoint interface {
 	ListRole() gin.HandlerFunc
 	ViewRole() gin.HandlerFunc
 	UpdateRole() gin.HandlerFunc
+	UpdateMultiRole() gin.HandlerFunc
 	DeleteRole() gin.HandlerFunc
 }
 
 type roleHandler struct {
 	service domains.Service
+}
+
+// UpdateMultiRole implements RoleEndpoint
+func (r *roleHandler) UpdateMultiRole() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req []requests.UpdateRole
+		if err := ctx.Bind(&req); err != nil {
+			utils.EncodeError(ctx, err, ctx.Writer)
+			return
+		}
+		dataRole, err := r.service.UpdateMultipleRole(ctx, &req)
+		if err != nil {
+			utils.EncodeError(ctx, err, ctx.Writer)
+			return
+		}
+		ctx.JSON(http.StatusCreated, dataRole)
+	}
 }
 
 // CreateRole implements RoleEndpoint
