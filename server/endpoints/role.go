@@ -36,12 +36,12 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		var req requests.CreateRole
 		if err := g.Bind(&req); err != nil {
-			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		dataRole, err := r.service.CreateRole(g, &req)
 		if err != nil {
-			g.JSON(http.StatusConflict, gin.H{"err": err.Error()})
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		g.JSON(http.StatusCreated, dataRole)
@@ -53,12 +53,12 @@ func (r *roleHandler) DeleteRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		req, err := decodeByEntityIdEndpoint(g)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		dataRole, err := r.service.DeleteRole(g, req.(*requests.EntityId))
 		if err != nil {
-			g.JSON(http.StatusNotFound, errors.NewNotFound(fmt.Sprintf("%v", req.(*requests.EntityId).Id), err))
+			utils.EncodeError(g, err, g.Writer)
 			return
 		}
 		g.JSON(http.StatusNoContent, dataRole)
