@@ -41,7 +41,7 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 		}
 		dataRole, err := r.service.CreateRole(g, &req)
 		if err != nil {
-			g.JSON(http.StatusConflict, errors.NewConflict(req.Name, err))
+			g.JSON(http.StatusConflict, gin.H{"err": err.Error()})
 			return
 		}
 		g.JSON(http.StatusCreated, dataRole)
