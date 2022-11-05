@@ -1,11 +1,13 @@
 package endpoints
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
+	"github.com/bagasunix/ginclean/server/endpoints/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,80 +39,79 @@ func (r *roleHandler) CreateRole() gin.HandlerFunc {
 			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		dataRole, err := r.service.CreateRole(g.Request.Context(), &req)
+		dataRole, err := r.service.CreateRole(g, &req)
 		if err != nil {
+			g.JSON(http.StatusConflict, errors.NewConflict(req.Name, err))
 			return
 		}
-		g.JSON(http.StatusOK, dataRole)
-		return
+		g.JSON(http.StatusCreated, dataRole)
 	}
 }
 
 // DeleteRole implements RoleEndpoint
 func (r *roleHandler) DeleteRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		var req requests.EntityId
-		if err := g.Bind(&req); err != nil {
+		req, err := decodeByEntityIdEndpoint(g)
+		if err != nil {
 			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		dataRole, err := r.service.DeleteRole(g, &req)
+		dataRole, err := r.service.DeleteRole(g, req.(*requests.EntityId))
 		if err != nil {
+			g.JSON(http.StatusNotFound, errors.NewNotFound(fmt.Sprintf("%v", req.(*requests.EntityId).Id), err))
 			return
 		}
-		g.JSON(http.StatusOK, dataRole)
-		return
+		g.JSON(http.StatusNoContent, dataRole)
 	}
 }
 
 // ListRole implements RoleEndpointd
 func (r *roleHandler) ListRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		var req requests.BaseList
-		if err := g.Bind(&req); err != nil {
+		req, err := decodeBaseListEndpoint(g)
+		if err != nil {
 			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		dataRole, err := r.service.ListRole(g, &req)
+		dataRole, err := r.service.ListRole(g, req.(*requests.BaseList))
 		if err != nil {
 			return
 		}
 		g.JSON(http.StatusOK, dataRole)
-		return
 	}
 }
 
 // UpdateRole implements RoleEndpoint
 func (r *roleHandler) UpdateRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		var req requests.UpdateRole
-		if err := g.Bind(&req); err != nil {
+		req, err := utils.DecodeByUpdateRoleEndpoint(g)
+		if err != nil {
 			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		dataRole, err := r.service.UpdateRole(g, &req)
-		if err != nil {
+		// var dataRole *requests.Empty
+		if _, err := r.service.UpdateRole(g, req.(*requests.UpdateRole)); err != nil {
+			g.JSON(http.StatusConflict, errors.NewConflict(fmt.Sprint(req.(*requests.UpdateRole).Name), err))
 			return
 		}
-		g.JSON(http.StatusOK, dataRole)
-		return
+		g.JSON(http.StatusOK, gin.H{})
 	}
 }
 
 // ViewRole implements RoleEndpoint
 func (r *roleHandler) ViewRole() gin.HandlerFunc {
 	return func(g *gin.Context) {
-		var req requests.EntityId
-		if err := g.Bind(&req); err != nil {
+		req, err := decodeByEntityIdEndpoint(g)
+		if err != nil {
 			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
 			return
 		}
-		dataRole, err := r.service.ViewRole(g, &req)
+		dataRole, err := r.service.ViewRole(g, req.(*requests.EntityId))
 		if err != nil {
+			g.JSON(http.StatusNotFound, errors.NewNotFound(fmt.Sprintf("%v", req.(*requests.EntityId)), err))
 			return
 		}
 		g.JSON(http.StatusOK, dataRole)
-		return
 	}
 }
 
