@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AccountEndpoint interface {
+type UserEndpoint interface {
 	CreateAccount() gin.HandlerFunc
 	ListAccount() gin.HandlerFunc
 	ViewAccount() gin.HandlerFunc
@@ -18,12 +18,12 @@ type AccountEndpoint interface {
 	DeleteAccount() gin.HandlerFunc
 }
 
-type accountHandler struct {
+type userHandler struct {
 	service domains.Service
 }
 
 // CreateAccount implements AccountEndpoint
-func (a *accountHandler) CreateAccount() gin.HandlerFunc {
+func (a *userHandler) CreateAccount() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		var req requests.CreateAccount
 		if err := g.Bind(&req); err != nil {
@@ -40,30 +40,30 @@ func (a *accountHandler) CreateAccount() gin.HandlerFunc {
 }
 
 // DeleteAccount implements AccountEndpoint
-func (a *accountHandler) DeleteAccount() gin.HandlerFunc {
+func (a *userHandler) DeleteAccount() gin.HandlerFunc {
 	panic("unimplemented")
 }
 
 // ListAccount implements AccountEndpoint
-func (a *accountHandler) ListAccount() gin.HandlerFunc {
+func (a *userHandler) ListAccount() gin.HandlerFunc {
 	panic("unimplemented")
 }
 
 // UpdateAccount implements AccountEndpoint
-func (a *accountHandler) UpdateAccount() gin.HandlerFunc {
+func (a *userHandler) UpdateAccount() gin.HandlerFunc {
 	panic("unimplemented")
 }
 
 // UpdateMultiAccount implements AccountEndpoint
-func (a *accountHandler) UpdateMultiAccount() gin.HandlerFunc {
+func (a *userHandler) UpdateMultiAccount() gin.HandlerFunc {
 	panic("unimplemented")
 }
 
 // ViewAccount implements AccountEndpoint
-func (a *accountHandler) ViewAccount() gin.HandlerFunc {
+func (a *userHandler) ViewAccount() gin.HandlerFunc {
 	panic("unimplemented")
 }
 
-func NewAccountEndpoint(svc domains.Service) AccountEndpoint {
-	return &accountHandler{service: svc}
+func NewUserEndpoint(svc domains.Service) UserEndpoint {
+	return &userHandler{service: svc}
 }
