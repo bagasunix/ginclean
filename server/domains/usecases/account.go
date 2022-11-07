@@ -81,7 +81,7 @@ func (*AccountUseCase) ViewAccountByID(ctx context.Context, req *requests.Entity
 	panic("unimplemented")
 }
 
-func NewUser(logs zap.Logger, r repositories.Repositories) AccountService {
+func NewAccount(logs zap.Logger, r repositories.Repositories) AccountService {
 	a := new(AccountUseCase)
 	a.logs = logs
 	a.repo = r
