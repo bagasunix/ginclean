@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/bagasunix/ginclean/server/domains/data/repositories/role"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -18,8 +19,8 @@ func (r *repo) GetRole() role.Repository {
 	return r.role
 }
 
-func New(db *gorm.DB) Repositories {
+func New(logs zap.Logger, db *gorm.DB) Repositories {
 	rs := new(repo)
-	rs.role = role.NewGorm(db)
+	rs.role = role.NewGorm(logs, db)
 	return rs
 }

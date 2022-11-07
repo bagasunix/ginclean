@@ -20,17 +20,17 @@ var (
 
 func Run() {
 	flag.Parse()
-
 	ctx := context.Background()
 
+	logger := InitLogger()
 	configs, _ := envs.LoadEnv()
-	db := InitDb(ctx, configs)
-	Migrate(db)
-	repo := repositories.New(db)
-	svc := InitService(repo)
-	eps := InitEndpoints(svc)
+	db := InitDb(ctx, logger, configs)
+	Migrate(logger, db)
+	repo := repositories.New(logger, db)
+	svc := InitService(logger, repo)
+	eps := InitEndpoints(logger, svc)
 
-	httpHandler := InitHttpHandler(eps)
+	httpHandler := InitHttpHandler(logger, eps)
 
 	srv := &http.Server{
 		Addr:    *httpAddr,

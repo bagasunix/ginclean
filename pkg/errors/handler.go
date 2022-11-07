@@ -2,17 +2,16 @@ package errors
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"go.uber.org/zap"
 )
 
-func HandlerWithOSExit(err error, args ...interface{}) {
+func HandlerWithOSExit(logger zap.Logger, err error, args ...interface{}) {
 	if err == nil {
 		return
 	}
-	log.Fatal(err.Error(), zap.Any("args:", args))
+	logger.Fatal(err.Error(), zap.Any("args:", args))
 	os.Exit(1)
 }
 

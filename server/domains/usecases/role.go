@@ -12,6 +12,7 @@ import (
 	"github.com/bagasunix/ginclean/server/endpoints/responses"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gofrs/uuid"
+	"go.uber.org/zap"
 )
 
 type RoleService interface {
@@ -24,6 +25,7 @@ type RoleService interface {
 }
 
 type RoleUseCase struct {
+	logs zap.Logger
 	repo repositories.Repositories
 }
 
@@ -175,8 +177,9 @@ func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) 
 	return resBuild.SetId(mRole.Build().Id).Build(), nil
 }
 
-func NewRole(r repositories.Repositories) RoleService {
+func NewRole(logs zap.Logger, r repositories.Repositories) RoleService {
 	u := new(RoleUseCase)
 	u.repo = r
+	u.logs = logs
 	return u
 }

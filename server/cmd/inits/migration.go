@@ -3,6 +3,7 @@ package inits
 import (
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains/data/models"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -11,6 +12,6 @@ func GetTables() (tables []interface{}) {
 	tables = append(tables, models.NewRoleBuilder().Build())
 	return tables
 }
-func Migrate(db *gorm.DB) {
-	errors.HandlerWithOSExit(db.AutoMigrate(GetTables()...), "AutoMigrate")
+func Migrate(logs zap.Logger, db *gorm.DB) {
+	errors.HandlerWithOSExit(logs, db.AutoMigrate(GetTables()...), "AutoMigrate")
 }

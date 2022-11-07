@@ -7,10 +7,11 @@ import (
 
 	"github.com/bagasunix/ginclean/pkg/db"
 	envs "github.com/bagasunix/ginclean/pkg/env"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-func InitDb(ctx context.Context, configs *envs.Configs) *gorm.DB {
+func InitDb(ctx context.Context, logs zap.Logger, configs *envs.Configs) *gorm.DB {
 
 	MaxIdleConns, _ := strconv.Atoi(configs.MaxIdleConns)
 	MaxOpenConns, _ := strconv.Atoi(configs.MaxOpenConns)
@@ -30,5 +31,5 @@ func InitDb(ctx context.Context, configs *envs.Configs) *gorm.DB {
 	configBuilder.SetConnMaxLifetime(ConnMaxLifetime)
 
 	config := configBuilder.Build()
-	return db.NewDB(ctx, config)
+	return db.NewDB(ctx, logs, config)
 }
