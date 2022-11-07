@@ -166,7 +166,7 @@ func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) 
 		return resBuild.Build(), err
 	}
 	mRole := models.NewRoleBuilder()
-	mRole.SetId(helpers.GenerateUUIDV1())
+	mRole.SetId(helpers.GenerateUUIDV1(r.logs))
 	mRole.SetName(req.Name)
 	mRole.SetCreatedAt(time.Now().UTC().Local())
 
