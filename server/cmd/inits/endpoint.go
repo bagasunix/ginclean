@@ -3,36 +3,39 @@ package inits
 import (
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints"
+	"github.com/bagasunix/ginclean/server/endpoints/middlewares"
 	"go.uber.org/zap"
 )
 
 func InitEndpoints(logs zap.Logger, svc domains.Service) endpoints.Endpoints {
 	a := endpoints.NewEndpointsBuilder()
+	a.SetMdw(getEndpointMiddleware(logs))
 	a.SetService(svc)
-	// a.SetMdw(getEndpointMiddleware())
 	return *a.Build()
 }
 
-// func getEndpointMiddleware() (mw map[string][]endpoints.Middleware) {
-// 	mw = map[string][]endpoints.Middleware{}
-// 	addDefaultEndpointMiddleware(mw)
-// 	return mw
-// }
+func getEndpointMiddleware(logs zap.Logger) (mw map[string][]endpoints.Middleware) {
+	mw = map[string][]endpoints.Middleware{}
+	addDefaultEndpointMiddleware(logs, mw)
+	return mw
+}
 
-// func middlewaresWithAuthentication(method string) []endpoints.Middleware {
-// 	mw := defaultMiddlewares(method)
-// 	return mw
-// 	// return append(mw, middlewares.Authentication())
-// }
+func middlewaresWithAuthentication(logs zap.Logger, method string) []endpoints.Middleware {
+	mw := defaultMiddlewares(logs, method)
+	return mw
+	// return append(mw, middlewares.Authentication())
+}
 
-// func defaultMiddlewares(method string) []endpoints.Middleware {
-// 	return []endpoints.Middleware{}
-// }
+func defaultMiddlewares(logs zap.Logger, method string) []endpoints.Middleware {
+	return []endpoints.Middleware{
+		middlewares.Logging(*logs.With(zap.Any("method", method))),
+	}
+}
 
-// func addDefaultEndpointMiddleware(mw map[string][]endpoints.Middleware) {
-// 	mw[endpoints.CREATE_ROLE] = middlewaresWithAuthentication(endpoints.CREATE_ROLE)
-// 	mw[endpoints.LIST_ROLE] = middlewaresWithAuthentication(endpoints.LIST_ROLE)
-// 	mw[endpoints.VIEW_ROLE] = middlewaresWithAuthentication(endpoints.VIEW_ROLE)
-// 	mw[endpoints.UPDATE_ROLE] = middlewaresWithAuthentication(endpoints.UPDATE_ROLE)
-// 	mw[endpoints.DELETE_ROLE] = middlewaresWithAuthentication(endpoints.DELETE_ROLE)
-// }
+func addDefaultEndpointMiddleware(logs zap.Logger, mw map[string][]endpoints.Middleware) {
+	mw[endpoints.CREATE_ROLE] = middlewaresWithAuthentication(logs, endpoints.CREATE_ROLE)
+	mw[endpoints.LIST_ROLE] = middlewaresWithAuthentication(logs, endpoints.LIST_ROLE)
+	mw[endpoints.VIEW_ROLE] = middlewaresWithAuthentication(logs, endpoints.VIEW_ROLE)
+	mw[endpoints.UPDATE_ROLE] = middlewaresWithAuthentication(logs, endpoints.UPDATE_ROLE)
+	mw[endpoints.DELETE_ROLE] = middlewaresWithAuthentication(logs, endpoints.DELETE_ROLE)
+}
