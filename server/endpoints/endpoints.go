@@ -10,7 +10,8 @@ type Endpoint func(ctx context.Context, req interface{}) (res interface{}, err e
 type Middleware func(Endpoint) Endpoint
 
 type Endpoints struct {
-	RoleEndpoint RoleEndpoint
+	RoleEndpoint    RoleEndpoint
+	AccountEndpoint AccountEndpoint
 }
 
 // Builder Object for Endpoints
@@ -30,6 +31,7 @@ func NewEndpointsBuilder() *EndpointsBuilder {
 func (b *EndpointsBuilder) Build() *Endpoints {
 	o := new(Endpoints)
 	o.RoleEndpoint = NewRoleEndpoint(b.service)
+	o.AccountEndpoint = NewAccountEndpoint(b.service)
 	return o
 }
 
