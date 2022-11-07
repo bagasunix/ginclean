@@ -17,6 +17,7 @@ const (
 	ERR_INVALID_KEY     = "invalid"
 	ERR_NOT_AUTHORIZED  = "unauthorized"
 	ERR_UNMARSHAL       = "cannot unmarshal"
+	ERR_INVALID_EMAIL   = "invalid email"
 )
 
 func CustomError(err string) error {
@@ -57,4 +58,8 @@ func ErrInvalidAttributes(attributes string) error {
 
 func ErrUnAuthorized() error {
 	return errors.New(ERR_NOT_AUTHORIZED)
+}
+
+func ErrValidEmail(logger zap.Logger, entity string) error {
+	return errors.New(fmt.Sprint(ERR_INVALID_EMAIL, " ", entity))
 }
