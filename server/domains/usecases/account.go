@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 
+	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/pkg/helpers"
 	"github.com/bagasunix/ginclean/server/domains/data/models"
 	"github.com/bagasunix/ginclean/server/domains/data/repositories"
@@ -10,7 +11,6 @@ import (
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/bagasunix/ginclean/server/endpoints/responses"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 type AccountService interface {
@@ -26,7 +26,6 @@ type AccountService interface {
 type AccountUseCase struct {
 	logs zap.Logger
 	repo repositories.Repositories
-	db   *gorm.DB
 }
 
 // CreateAccount implements AccountService
@@ -35,6 +34,10 @@ func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.Create
 
 	if err = req.Validate(); err != nil {
 		return resBuilder.Build(), err
+	}
+
+	if helpers.IsEmailValid(req.Email) != true {
+		return nil, errors.ErrValidEmail(a.logs, req.Email)
 	}
 
 	mUser := models.NewAccountBuilder()
