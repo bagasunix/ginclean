@@ -40,3 +40,8 @@ func (s *ServiceBuilder) Build() Service {
 	}
 	return svc
 }
+
+// Setter method for the field middleware of type []Middleware in the object ServiceBuilder
+func (s *ServiceBuilder) SetMiddleware(middleware []Middleware) {
+	s.middleware = middleware
+}
