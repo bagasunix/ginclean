@@ -17,7 +17,7 @@ type Endpoints struct {
 type EndpointsBuilder struct {
 	service domains.Service
 	// mdws    map[string][]gin.HandlerFunc
-	// mdw     map[string][]Middleware
+	mdw map[string][]Middleware
 }
 
 // Constructor for EndpointsBuilder
@@ -36,4 +36,9 @@ func (b *EndpointsBuilder) Build() *Endpoints {
 // Setter method for the field service of type domains.Service in the object EndpointsBuilder
 func (e *EndpointsBuilder) SetService(service domains.Service) {
 	e.service = service
+}
+
+// Setter method for the field mdw of type map[string][]Middleware in the object EndpointsBuilder
+func (e *EndpointsBuilder) SetMdw(mdw map[string][]Middleware) {
+	e.mdw = mdw
 }
