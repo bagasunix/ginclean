@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MakeUserHandler(eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
+func MakeRoleHandler(eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
 	rg.Use(middlewares.CORSMiddleware())
 	rg.POST("", eps.CreateRole())
 	rg.GET("", eps.ListRole())

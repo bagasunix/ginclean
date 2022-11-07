@@ -11,6 +11,6 @@ func NewHttpHandler(r *gin.Engine, eps endpoints.Endpoints) *gin.Engine {
 	r.Use(middlewares.CORSMiddleware())
 
 	// Create an account group
-	handlers.MakeUserHandler(eps.RoleEndpoint, r.Group("/v1/role"))
+	handlers.MakeRoleHandler(eps.RoleEndpoint, r.Group("/v1/role"))
 	return r
 }
