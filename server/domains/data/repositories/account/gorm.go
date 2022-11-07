@@ -58,7 +58,7 @@ func (g *gormProvider) GetModelName() string {
 	return "Account"
 }
 
-func NewGorm(logs zap.Logger, db *gorm.DB) AccountRepository {
+func NewGorm(logs zap.Logger, db *gorm.DB) Repository {
 	g := new(gormProvider)
 	g.logs = logs
 	g.db = db

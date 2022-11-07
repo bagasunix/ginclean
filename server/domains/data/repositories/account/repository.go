@@ -20,7 +20,7 @@ type Query interface {
 	GetByEmail(ctx context.Context, email string) (result models.SingleResult[*models.Account])
 }
 
-type AccountRepository interface {
+type Repository interface {
 	Command
 	Query
 	base.Repository
