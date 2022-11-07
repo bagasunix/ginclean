@@ -8,12 +8,12 @@ import (
 
 func GenerateUUIDV1(logs zap.Logger) uuid.UUID {
 	id, err := uuid.NewV1()
-	errors.HandlerReturnedVoid(err, "uuid", "generator")
+	errors.HandlerWithLoggerReturnedVoid(logs, err, "uuid", "generator")
 	return id
 }
 
 func GenerateUUIDV4(logs zap.Logger) uuid.UUID {
 	id, err := uuid.NewV4()
-	errors.HandlerReturnedVoid(err, "uuid", "generator")
+	errors.HandlerWithLoggerReturnedVoid(logs, err, "uuid", "generator")
 	return id
 }
