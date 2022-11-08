@@ -10,6 +10,7 @@ import (
 	"github.com/bagasunix/ginclean/server/domains/entities"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/bagasunix/ginclean/server/endpoints/responses"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"go.uber.org/zap"
 )
 
@@ -70,8 +71,53 @@ func (*AccountUseCase) DisableMultipleAccount(ctx context.Context, req []string)
 }
 
 // ListAccount implements AccountService
-func (*AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
-	panic("unimplemented")
+func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
+	var (
+		accounteData []entities.Account
+		result       models.SliceResult[models.Account]
+	)
+	if req.Limit == 0 {
+		req.Limit = 25
+	}
+	resBuilder := responses.NewListEntityBuilder[entities.Account]()
+	if validation.IsEmpty(req.Keyword) {
+		result = a.repo.GetAccount().GetAll(ctx, req.Limit)
+		for _, v := range result.Value {
+			resRole := a.repo.GetRole().GetById(ctx, v.RoleId)
+			roleBuild := entities.NewRoleBuilder()
+			roleBuild.SetId(resRole.Value.Id)
+			roleBuild.SetName(resRole.Value.Name)
+
+			accountBuild := entities.NewAccountBuilder()
+			accountBuild.SetId(v.Id)
+			accountBuild.SetEmail(v.Email)
+			accountBuild.SetIsActive(v.IsActive)
+			accountBuild.SetRole(*roleBuild.Build())
+			accountBuild.SetCreatedAt(v.CreatedAt)
+			accountBuild.SetCreatedBy(v.CreatedBy)
+			accounteData = append(accounteData, *accountBuild.Build())
+		}
+		resBuilder.SetData(accounteData)
+		return resBuilder.Build(), result.Error
+	}
+	result = a.repo.GetAccount().GetByKeywords(ctx, req.Keyword, req.Limit)
+	for _, v := range result.Value {
+		resRole := a.repo.GetRole().GetById(ctx, v.RoleId)
+		roleBuild := entities.NewRoleBuilder()
+		roleBuild.SetId(resRole.Value.Id)
+		roleBuild.SetName(resRole.Value.Name)
+
+		accountBuild := entities.NewAccountBuilder()
+		accountBuild.SetId(v.Id)
+		accountBuild.SetEmail(v.Email)
+		accountBuild.SetIsActive(v.IsActive)
+		accountBuild.SetRole(*roleBuild.Build())
+		accountBuild.SetCreatedAt(v.CreatedAt)
+		accountBuild.SetCreatedBy(v.CreatedBy)
+		accounteData = append(accounteData, *accountBuild.Build())
+	}
+	resBuilder.SetData(accounteData)
+	return resBuilder.Build(), result.Error
 }
 
 // ViewAccountByEmail implements AccountService
