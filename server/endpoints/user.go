@@ -12,10 +12,28 @@ import (
 type UserEndpoint interface {
 	CreateUser() gin.HandlerFunc
 	ListAccount() gin.HandlerFunc
+	DeleteAccount() gin.HandlerFunc
 }
 
 type userHandler struct {
 	service domains.Service
+}
+
+// DeleteAccount implements UserEndpoint
+func (u *userHandler) DeleteAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		req, err := decodeByEntityIdEndpoint(g)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataAccount, err := u.service.DeleteAccount(g, req.(*requests.EntityId))
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		g.JSON(http.StatusNoContent, dataAccount)
+	}
 }
 
 // ListAccount implements UserEndpoint
@@ -26,12 +44,12 @@ func (u *userHandler) ListAccount() gin.HandlerFunc {
 			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		dataRole, err := u.service.ListAccount(g, req.(*requests.BaseList))
+		dataAccount, err := u.service.ListAccount(g, req.(*requests.BaseList))
 		if err != nil {
 			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		g.JSON(http.StatusOK, dataRole)
+		g.JSON(http.StatusOK, dataAccount)
 	}
 }
 
@@ -43,12 +61,12 @@ func (u *userHandler) CreateUser() gin.HandlerFunc {
 			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		dataRole, err := u.service.CreateAccount(g, &req)
+		dataAccount, err := u.service.CreateAccount(g, &req)
 		if err != nil {
 			utils.EncodeError(g, err, g.Writer)
 			return
 		}
-		g.JSON(http.StatusCreated, dataRole)
+		g.JSON(http.StatusCreated, dataAccount)
 	}
 }
 
