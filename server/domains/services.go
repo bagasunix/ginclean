@@ -8,10 +8,12 @@ import (
 
 type Service interface {
 	usecases.RoleService
+	usecases.AccountService
 }
 
 type service struct {
 	usecases.RoleService
+	usecases.AccountService
 }
 
 type ServiceBuilder struct {
@@ -22,14 +24,15 @@ type ServiceBuilder struct {
 
 func NewServiceBuilder(logs zap.Logger, repo repositories.Repositories) *ServiceBuilder {
 	s := new(ServiceBuilder)
-	s.repo = repo
 	s.logs = logs
+	s.repo = repo
 	return s
 }
 
 func buildService(logs zap.Logger, repo repositories.Repositories) Service {
 	svc := new(service)
 	svc.RoleService = usecases.NewRole(logs, repo)
+	svc.AccountService = usecases.NewAccount(logs, repo)
 	return svc
 }
 

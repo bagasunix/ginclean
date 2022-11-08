@@ -52,7 +52,7 @@ var env = map[string]map[string]string{
 	},
 	"DB_NAME": {
 		"Key":          "DbName",
-		"DefaultValue": "goboilerplate",
+		"DefaultValue": "ginclean",
 	},
 	"DB_USER": {
 		"Key":          "DbUsername",

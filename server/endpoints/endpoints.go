@@ -11,13 +11,13 @@ type Middleware func(Endpoint) Endpoint
 
 type Endpoints struct {
 	RoleEndpoint RoleEndpoint
+	UserEndpoint UserEndpoint
 }
 
 // Builder Object for Endpoints
 type EndpointsBuilder struct {
 	service domains.Service
-	// mdws    map[string][]gin.HandlerFunc
-	mdw map[string][]Middleware
+	mdw     map[string][]Middleware
 }
 
 // Constructor for EndpointsBuilder
@@ -30,6 +30,7 @@ func NewEndpointsBuilder() *EndpointsBuilder {
 func (b *EndpointsBuilder) Build() *Endpoints {
 	o := new(Endpoints)
 	o.RoleEndpoint = NewRoleEndpoint(b.service)
+	o.UserEndpoint = NewUserEndpoint(b.service)
 	return o
 }
 
