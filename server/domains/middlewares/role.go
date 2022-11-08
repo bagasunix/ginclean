@@ -10,6 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// CreateMultiRole implements domains.Service
+func (l *loggingMiddleware) CreateMultiRole(ctx context.Context, req *[]requests.CreateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error) {
+	defer func(begin time.Time) {
+		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "CreateRole"), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
+	}(time.Now())
+	return l.next.CreateMultiRole(ctx, req)
+}
+
 // CreateRole implements domains.Service
 func (l *loggingMiddleware) CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error) {
 	defer func(begin time.Time) {
