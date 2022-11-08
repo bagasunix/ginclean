@@ -11,10 +11,28 @@ import (
 
 type UserEndpoint interface {
 	CreateUser() gin.HandlerFunc
+	ListAccount() gin.HandlerFunc
 }
 
 type userHandler struct {
 	service domains.Service
+}
+
+// ListAccount implements UserEndpoint
+func (u *userHandler) ListAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		req, err := decodeBaseListEndpoint(g)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataRole, err := u.service.ListAccount(g, req.(*requests.BaseList))
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+	}
 }
 
 // CreateUser implements UserEndpoint

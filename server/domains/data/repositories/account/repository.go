@@ -18,6 +18,7 @@ type Query interface {
 	GetAll(ctx context.Context, limit int64) (result models.SliceResult[models.Account])
 	GetById(ctx context.Context, id uuid.UUID) (result models.SingleResult[*models.Account])
 	GetByEmail(ctx context.Context, email string) (result models.SingleResult[*models.Account])
+	GetByKeywords(ctx context.Context, keywords string, limit int64) (result models.SliceResult[models.Account])
 }
 
 type Repository interface {
