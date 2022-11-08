@@ -24,8 +24,8 @@ func (g *gormProvider) GetByKeywords(ctx context.Context, keywords string, limit
 }
 
 // UpdateStatus implements AccountRepository
-func (g *gormProvider) UpdateStatus(ctx context.Context, id uuid.UUID, stat bool) error {
-	return errors.ErrSomethingWrong(g.logs, g.db.WithContext(ctx).Where("id = ?", id.String()).Update("isActive = ?", stat).Error)
+func (g *gormProvider) UpdateStatus(ctx context.Context, model *models.Account) error {
+	return errors.ErrSomethingWrong(g.logs, g.db.WithContext(ctx).Updates(model).Error)
 }
 
 // Delete implements AccountRepository
