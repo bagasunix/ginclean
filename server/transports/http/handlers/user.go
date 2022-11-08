@@ -9,5 +9,6 @@ func MakeUserHandler(eps endpoints.UserEndpoint, rg *gin.RouterGroup) *gin.Route
 	rg.POST("", eps.CreateUser())
 	rg.GET("", eps.ListAccount())
 	rg.DELETE("/:id", eps.DeleteAccount())
+	rg.PUT("", eps.DisableAccount())
 	return rg
 }
