@@ -2,6 +2,7 @@ package account
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains/data/models"
@@ -13,6 +14,13 @@ import (
 type gormProvider struct {
 	db   *gorm.DB
 	logs zap.Logger
+}
+
+// GetByKeywords implements Repository
+func (g *gormProvider) GetByKeywords(ctx context.Context, keywords string, limit int64) (result models.SliceResult[models.Account]) {
+	a := fmt.Sprint('%', keywords, '%')
+	result.Error = errors.ErrRecordNotFound(g.logs, g.GetModelName(), g.db.WithContext(ctx).Where("name like ?", a).Limit(int(limit)).Find(&result.Value).Error)
+	return result
 }
 
 // UpdateStatus implements AccountRepository
