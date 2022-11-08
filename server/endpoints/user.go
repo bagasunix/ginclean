@@ -13,10 +13,28 @@ type UserEndpoint interface {
 	CreateUser() gin.HandlerFunc
 	ListAccount() gin.HandlerFunc
 	DeleteAccount() gin.HandlerFunc
+	DisableAccount() gin.HandlerFunc
 }
 
 type userHandler struct {
 	service domains.Service
+}
+
+// DisableAccount implements UserEndpoint
+func (u *userHandler) DisableAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		var req requests.DisableAccount
+		if err := g.Bind(&req); err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataAccount, err := u.service.DisableAccount(g, &req)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		g.JSON(http.StatusOK, dataAccount)
+	}
 }
 
 // DeleteAccount implements UserEndpoint
