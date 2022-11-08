@@ -30,7 +30,7 @@ func Run() {
 	svc := InitService(logger, repo)
 	eps := InitEndpoints(logger, svc)
 
-	httpHandler := InitHttpHandler(logger, eps)
+	httpHandler := InitHttpHandler(&logger, eps)
 
 	srv := &http.Server{
 		Addr:    *httpAddr,
