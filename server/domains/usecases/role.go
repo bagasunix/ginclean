@@ -17,6 +17,7 @@ import (
 
 type RoleService interface {
 	CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error)
+	CreateMultiRole(ctx context.Context, req *[]requests.CreateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error)
 	ListRole(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Role], err error)
 	ViewRole(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Role], err error)
 	UpdateRole(ctx context.Context, req *requests.UpdateRole) (res *responses.Empty, err error)
@@ -27,6 +28,39 @@ type RoleService interface {
 type RoleUseCase struct {
 	logs zap.Logger
 	repo repositories.Repositories
+}
+
+// CreateMultiRole implements RoleService
+func (r *RoleUseCase) CreateMultiRole(ctx context.Context, req *[]requests.CreateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error) {
+	var (
+		dataFailed, dataSuccess []entities.Role
+	)
+	resBuilder := responses.NewListMultipleBuilder[entities.Role, entities.Role]()
+	newEntities := entities.NewRoleBuilder()
+
+	for _, v := range *req {
+		if err = v.Validate(); err != nil {
+			newEntities.SetName(v.Name)
+			dataFailed = append(dataFailed, *newEntities.Build())
+			continue
+		}
+		mRole := models.NewRoleBuilder()
+		mRole.SetId(helpers.GenerateUUIDV1(r.logs))
+		mRole.SetName(v.Name)
+		mRole.SetCreatedAt(time.Now().UTC().Local())
+
+		if err = r.repo.GetRole().Create(ctx, mRole.Build()); err != nil {
+			newEntities.SetName(v.Name)
+			dataFailed = append(dataFailed, *newEntities.Build())
+			continue
+		}
+		newEntities.SetId(mRole.Build().Id)
+		newEntities.SetName(mRole.Build().Name)
+		newEntities.SetCreatedAt(mRole.Build().CreatedAt)
+		dataSuccess = append(dataSuccess, *newEntities.Build())
+	}
+	resBuilder.SetDataMulti(dataSuccess, dataFailed)
+	return resBuilder.Build(), err
 }
 
 // UpdateMultipleRole implements RoleService
