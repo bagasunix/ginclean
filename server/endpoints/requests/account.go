@@ -32,3 +32,14 @@ func (s *CreateAccount) ToJSON() []byte {
 	errors.HandlerReturnedVoid(err)
 	return j
 }
+
+type DisableAccount struct {
+	EntityId
+	IsActive bool `json:"is_active"`
+}
+
+func (s *DisableAccount) ToJSON() []byte {
+	j, err := json.Marshal(s)
+	errors.HandlerReturnedVoid(err)
+	return j
+}
