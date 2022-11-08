@@ -11,6 +11,7 @@ import (
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/bagasunix/ginclean/server/endpoints/responses"
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
 )
 
@@ -56,8 +57,15 @@ func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.Create
 }
 
 // DeleteAccount implements AccountService
-func (*AccountUseCase) DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
-	panic("unimplemented")
+func (a *AccountUseCase) DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+	result := a.repo.GetAccount().GetById(ctx, req.Id.(uuid.UUID))
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return new(responses.Empty), a.repo.GetAccount().Delete(ctx, req.Id.(uuid.UUID))
 }
 
 // DisableAccount implements AccountService
