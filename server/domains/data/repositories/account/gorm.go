@@ -19,7 +19,7 @@ type gormProvider struct {
 // GetByKeywords implements Repository
 func (g *gormProvider) GetByKeywords(ctx context.Context, keywords string, limit int64) (result models.SliceResult[models.Account]) {
 	a := fmt.Sprint('%', keywords, '%')
-	result.Error = errors.ErrRecordNotFound(g.logs, g.GetModelName(), g.db.WithContext(ctx).Where("name like ?", a).Limit(int(limit)).Find(&result.Value).Error)
+	result.Error = errors.ErrRecordNotFound(g.logs, g.GetModelName(), g.db.WithContext(ctx).Where("email like ?", a).Limit(int(limit)).Find(&result.Value).Error)
 	return result
 }
 
