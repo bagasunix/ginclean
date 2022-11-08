@@ -13,7 +13,7 @@ import (
 // CreateMultiRole implements domains.Service
 func (l *loggingMiddleware) CreateMultiRole(ctx context.Context, req *[]requests.CreateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error) {
 	defer func(begin time.Time) {
-		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "CreateRole"), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
+		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "CreateRole"), zap.Any("request", req), zap.Any("response_success", res.Data.Success), zap.Any("response_failed", res.Data.Failed), zap.Any("err", err), zap.Any("took", time.Since(begin)))
 	}(time.Now())
 	return l.next.CreateMultiRole(ctx, req)
 }
@@ -45,7 +45,7 @@ func (l *loggingMiddleware) ListRole(ctx context.Context, req *requests.BaseList
 // UpdateMultipleRole implements domains.Service
 func (l *loggingMiddleware) UpdateMultipleRole(ctx context.Context, req *[]requests.UpdateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error) {
 	defer func(begin time.Time) {
-		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "UpdateRoleMulti"), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
+		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "UpdateRoleMulti"), zap.Any("request", req), zap.Any("response_success", res.Data.Success), zap.Any("response_failed", res.Data.Failed), zap.Any("err", err), zap.Any("took", time.Since(begin)))
 	}(time.Now())
 	return l.next.UpdateMultipleRole(ctx, req)
 }
