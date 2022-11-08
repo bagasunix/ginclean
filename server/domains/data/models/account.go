@@ -8,7 +8,7 @@ type Account struct {
 	Password string
 	RoleId   uuid.UUID
 	Role     *Role `gorm:"foreignKey:RoleId;constraint:OnUpdate:CASCADE,OnDelete:Restrict"`
-	IsActive bool
+	IsActive *bool
 }
 
 // Builder Object for User
@@ -18,7 +18,7 @@ type accountBuilder struct {
 	password string
 	roleId   uuid.UUID
 	role     *Role
-	isActive bool
+	isActive *bool
 }
 
 // Constructor for accountBuilder
@@ -60,6 +60,6 @@ func (u *accountBuilder) SetRole(role *Role) {
 }
 
 // Setter method for the field isActive of type bool in the object accountBuilder
-func (u *accountBuilder) SetIsActive(isActive bool) {
+func (u *accountBuilder) SetIsActive(isActive *bool) {
 	u.isActive = isActive
 }
