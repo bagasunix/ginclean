@@ -7,6 +7,7 @@ import (
 
 func MakeRoleHandler(eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
 	rg.POST("", eps.CreateRole())
+	rg.POST("/create-multiple-role", eps.CreateMultiRole())
 	rg.GET("", eps.ListRole())
 	rg.GET("/:id", eps.ViewRole())
 	rg.PATCH("/:id", eps.UpdateRole())
