@@ -27,7 +27,7 @@ func (l *loggingMiddleware) DeleteAccount(ctx context.Context, req *requests.Ent
 }
 
 // DisableAccount implements domains.Service
-func (l *loggingMiddleware) DisableAccount(ctx context.Context, request *requests.EntityId) (response *responses.Empty, err error) {
+func (l *loggingMiddleware) DisableAccount(ctx context.Context, request *requests.DisableAccount) (response *responses.Empty, err error) {
 	defer func(begin time.Time) {
 		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "DisableAccount"), zap.Any("request", string(request.ToJSON())), zap.Any("response", string(response.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
 	}(time.Now())
