@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"time"
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/pkg/helpers"
@@ -20,7 +21,7 @@ type AccountService interface {
 	ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error)
 	ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error)
 	ViewAccountByEmail(ctx context.Context, email string) (res *responses.ViewEntity[*entities.Account], err error)
-	DisableAccount(ctx context.Context, request *requests.EntityId) (response *responses.Empty, err error)
+	DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error)
 	DisableMultipleAccount(ctx context.Context, req []string) (res *responses.ListMultiple[*entities.Account, *entities.Account], err error)
 	DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
 }
@@ -33,6 +34,7 @@ type AccountUseCase struct {
 // CreateAccount implements AccountService
 func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.CreateAccount) (res *responses.EntityId, err error) {
 	resBuilder := responses.NewEntityIdBuilder()
+	defaultStat := true
 
 	if err = req.Validate(); err != nil {
 		return resBuilder.Build(), err
@@ -47,7 +49,7 @@ func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.Create
 	mUser.SetEmail(req.Email)
 	mUser.SetPassword(helpers.HashAndSalt([]byte(req.Password)))
 	mUser.SetRoleId(req.Role)
-	mUser.SetIsActive(true)
+	mUser.SetIsActive(&defaultStat)
 
 	if err = a.repo.GetAccount().Create(ctx, mUser.Build()); err != nil {
 		return resBuilder.Build(), err
@@ -69,8 +71,17 @@ func (a *AccountUseCase) DeleteAccount(ctx context.Context, req *requests.Entity
 }
 
 // DisableAccount implements AccountService
-func (*AccountUseCase) DisableAccount(ctx context.Context, request *requests.EntityId) (response *responses.Empty, err error) {
-	panic("unimplemented")
+func (a *AccountUseCase) DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error) {
+	uUid := uuid.FromStringOrNil(req.Id.(string))
+	result := a.repo.GetAccount().GetById(ctx, uUid)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	mBuild := models.NewAccountBuilder()
+	mBuild.SetId(uUid)
+	mBuild.SetIsActive(&req.IsActive)
+	mBuild.SetUpdatedAt(time.Now())
+	return new(responses.Empty), a.repo.GetAccount().UpdateStatus(ctx, mBuild.Build())
 }
 
 // DisableMultipleAccount implements AccountService
@@ -99,7 +110,7 @@ func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList
 			accountBuild := entities.NewAccountBuilder()
 			accountBuild.SetId(v.Id)
 			accountBuild.SetEmail(v.Email)
-			accountBuild.SetIsActive(v.IsActive)
+			accountBuild.SetIsActive(*v.IsActive)
 			accountBuild.SetRole(*roleBuild.Build())
 			accountBuild.SetCreatedAt(v.CreatedAt)
 			accountBuild.SetCreatedBy(v.CreatedBy)
@@ -118,7 +129,7 @@ func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList
 		accountBuild := entities.NewAccountBuilder()
 		accountBuild.SetId(v.Id)
 		accountBuild.SetEmail(v.Email)
-		accountBuild.SetIsActive(v.IsActive)
+		accountBuild.SetIsActive(*v.IsActive)
 		accountBuild.SetRole(*roleBuild.Build())
 		accountBuild.SetCreatedAt(v.CreatedAt)
 		accountBuild.SetCreatedBy(v.CreatedBy)
