@@ -11,7 +11,7 @@ type Account struct {
 type AccountBuilder struct {
 	EntityBuilder
 	email    string
-	Role     Role
+	role     Role
 	isActive bool
 }
 
@@ -25,7 +25,7 @@ func NewAccountBuilder() *AccountBuilder {
 func (b *AccountBuilder) Build() *Account {
 	o := new(Account)
 	o.Entity = *b.EntityBuilder.Build()
-	o.Role = &b.Role
+	o.Role = &b.role
 	o.Email = b.email
 	o.IsActive = b.isActive
 	return o
@@ -39,4 +39,9 @@ func (a *AccountBuilder) SetEmail(email string) {
 // Setter method for the field isActive of type bool in the object AccountBuilder
 func (a *AccountBuilder) SetIsActive(isActive bool) {
 	a.isActive = isActive
+}
+
+// Setter method for the field role of type Role in the object AccountBuilder
+func (a *AccountBuilder) SetRole(role Role) {
+	a.role = role
 }
