@@ -35,7 +35,7 @@ func (l *loggingMiddleware) ListRole(ctx context.Context, req *requests.BaseList
 }
 
 // UpdateMultipleRole implements domains.Service
-func (l *loggingMiddleware) UpdateMultipleRole(ctx context.Context, req *[]requests.UpdateRole) (res *responses.ListMultiple[requests.UpdateRole, requests.UpdateRole], err error) {
+func (l *loggingMiddleware) UpdateMultipleRole(ctx context.Context, req *[]requests.UpdateRole) (res *responses.ListMultiple[entities.Role, entities.Role], err error) {
 	defer func(begin time.Time) {
 		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "UpdateRoleMulti"), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
 	}(time.Now())
