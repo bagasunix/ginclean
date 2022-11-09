@@ -10,6 +10,7 @@ import (
 func GetTables() (tables []interface{}) {
 	tables = append(tables, models.NewAccountBuilder().Build())
 	tables = append(tables, models.NewRoleBuilder().Build())
+	tables = append(tables, models.NewRefershTokenBuilder().Build())
 	return tables
 }
 func Migrate(logs zap.Logger, db *gorm.DB) {
