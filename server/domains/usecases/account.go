@@ -91,7 +91,7 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	mRefreshToken.SetToken(refreshToken)
 	mRefreshToken.SetCreatedAt(time.Now().Local().UTC())
 
-	if err = a.repo.GetRefreshToken().CreateRefershToken(ctx, mRefreshToken.Build()); err != nil {
+	if err = a.repo.GetRefreshToken().Create(ctx, mRefreshToken.Build()); err != nil {
 		return resBuild.Build(), err
 	}
 
