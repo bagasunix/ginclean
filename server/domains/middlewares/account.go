@@ -34,14 +34,6 @@ func (l *loggingMiddleware) DisableAccount(ctx context.Context, request *request
 	return l.next.DisableAccount(ctx, request)
 }
 
-// DisableMultipleAccount implements domains.Service
-func (l *loggingMiddleware) DisableMultipleAccount(ctx context.Context, req []string) (res *responses.ListMultiple[*entities.Account, *entities.Account], err error) {
-	defer func(begin time.Time) {
-		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "DisableAccount"), zap.Any("request", req), zap.Any("response_success", res.Data.Success), zap.Any("response_failed", res.Data.Failed), zap.Any("err", err), zap.Any("took", time.Since(begin)))
-	}(time.Now())
-	return l.next.DisableMultipleAccount(ctx, req)
-}
-
 // ListAccount implements domains.Service
 func (l *loggingMiddleware) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
 	defer func(begin time.Time) {
