@@ -7,19 +7,19 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type SignInWithUserNamePassword struct {
-	UserName string `json:"userName"`
+type SignInWithEmailPassword struct {
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (s *SignInWithUserNamePassword) Validate() error {
-	if validation.IsEmpty(s.UserName) || validation.IsEmpty(s.Password) {
-		return errors.ErrInvalidAttributes("username or password")
+func (s *SignInWithEmailPassword) Validate() error {
+	if validation.IsEmpty(s.Email) || validation.IsEmpty(s.Password) {
+		return errors.ErrInvalidAttributes("email or password")
 	}
 	return nil
 }
 
-func (s *SignInWithUserNamePassword) ToJSON() []byte {
+func (s *SignInWithEmailPassword) ToJSON() []byte {
 	j, err := json.Marshal(s)
 	errors.HandlerReturnedVoid(err)
 	return j
