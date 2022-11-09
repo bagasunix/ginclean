@@ -29,7 +29,7 @@ func Run() {
 
 	// ************ Service ************
 	repo := repositories.New(logger, db)
-	svc := InitService(logger, repo)
+	svc := InitService(logger, configs, repo)
 	eps := InitEndpoints(logger, svc)
 	httpHandler := InitHttpHandler(&logger, eps)
 
