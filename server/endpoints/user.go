@@ -16,10 +16,29 @@ type UserEndpoint interface {
 	DeleteAccount() gin.HandlerFunc
 	DisableAccount() gin.HandlerFunc
 	ViewAccount() gin.HandlerFunc
+	LoginAccount() gin.HandlerFunc
 }
 
 type userHandler struct {
 	service domains.Service
+}
+
+// LoginAccount implements UserEndpoint
+func (u *userHandler) LoginAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		var req requests.SignInWithEmailPassword
+		if err := g.Bind(&req); err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataAccount, err := u.service.LoginAccount(g, &req)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+
+		g.JSON(http.StatusCreated, dataAccount)
+	}
 }
 
 // ViewAccount implements UserEndpoint
