@@ -3,6 +3,7 @@ package endpoints
 import (
 	"net/http"
 
+	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/bagasunix/ginclean/server/endpoints/utils"
@@ -14,10 +15,28 @@ type UserEndpoint interface {
 	ListAccount() gin.HandlerFunc
 	DeleteAccount() gin.HandlerFunc
 	DisableAccount() gin.HandlerFunc
+	ViewAccount() gin.HandlerFunc
 }
 
 type userHandler struct {
 	service domains.Service
+}
+
+// ViewAccount implements UserEndpoint
+func (u *userHandler) ViewAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		req, err := decodeByEntityIdEndpoint(g)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataRole, err := u.service.ViewAccountByID(g, req.(*requests.EntityId))
+		if err != nil {
+			g.JSON(http.StatusBadRequest, errors.NewBadRequest(err))
+			return
+		}
+		g.JSON(http.StatusOK, dataRole)
+	}
 }
 
 // DisableAccount implements UserEndpoint
