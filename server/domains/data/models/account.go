@@ -12,7 +12,7 @@ type Account struct {
 }
 
 // Builder Object for User
-type accountBuilder struct {
+type AccountBuilder struct {
 	BaseModelBuilder
 	email    string
 	password string
@@ -21,14 +21,14 @@ type accountBuilder struct {
 	isActive *bool
 }
 
-// Constructor for accountBuilder
-func NewAccountBuilder() *accountBuilder {
-	o := new(accountBuilder)
+// Constructor for AccountBuilder
+func NewAccountBuilder() *AccountBuilder {
+	o := new(AccountBuilder)
 	return o
 }
 
 // Build Method which creates User
-func (b *accountBuilder) Build() *Account {
+func (b *AccountBuilder) Build() *Account {
 	o := new(Account)
 	o.BaseModel = *b.BaseModelBuilder.Build()
 	o.Email = b.email
@@ -39,27 +39,27 @@ func (b *accountBuilder) Build() *Account {
 	return o
 }
 
-// Setter method for the field email of type string in the object accountBuilder
-func (u *accountBuilder) SetEmail(email string) {
+// Setter method for the field email of type string in the object AccountBuilder
+func (u *AccountBuilder) SetEmail(email string) {
 	u.email = email
 }
 
-// Setter method for the field password of type string in the object accountBuilder
-func (u *accountBuilder) SetPassword(password string) {
+// Setter method for the field password of type string in the object AccountBuilder
+func (u *AccountBuilder) SetPassword(password string) {
 	u.password = password
 }
 
-// Setter method for the field roleId of type uuid.UUID in the object accountBuilder
-func (u *accountBuilder) SetRoleId(roleId uuid.UUID) {
+// Setter method for the field roleId of type uuid.UUID in the object AccountBuilder
+func (u *AccountBuilder) SetRoleId(roleId uuid.UUID) {
 	u.roleId = roleId
 }
 
-// Setter method for the field role of type *Role in the object accountBuilder
-func (u *accountBuilder) SetRole(role *Role) {
+// Setter method for the field role of type *Role in the object AccountBuilder
+func (u *AccountBuilder) SetRole(role *Role) {
 	u.role = role
 }
 
 // Setter method for the field isActive of type bool in the object accountBuilder
-func (u *accountBuilder) SetIsActive(isActive *bool) {
+func (u *AccountBuilder) SetIsActive(isActive *bool) {
 	u.isActive = isActive
 }
