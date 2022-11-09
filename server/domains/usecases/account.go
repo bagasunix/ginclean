@@ -6,6 +6,7 @@ import (
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/pkg/helpers"
+	"github.com/bagasunix/ginclean/pkg/jwt"
 	"github.com/bagasunix/ginclean/server/domains/data/models"
 	"github.com/bagasunix/ginclean/server/domains/data/repositories"
 	"github.com/bagasunix/ginclean/server/domains/entities"
@@ -22,15 +23,85 @@ type AccountService interface {
 	ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error)
 	DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error)
 	DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
+	LoginAccount(ctx context.Context, req *requests.SignInWithEmailPassword) (res *responses.SignIn, err error)
 }
 
-type AccountUseCase struct {
-	logs zap.Logger
-	repo repositories.Repositories
+type accountUseCase struct {
+	jwtKey string
+	logs   zap.Logger
+	repo   repositories.Repositories
+}
+
+// LoginAccount implements AccountService
+func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInWithEmailPassword) (res *responses.SignIn, err error) {
+	resBuild := responses.NewSignInBuilder()
+	if req.Validate() != nil {
+		return resBuild.Build(), req.Validate()
+	}
+
+	if helpers.IsEmailValid(req.Email) == false {
+		return resBuild.Build(), errors.ErrValidEmail(a.logs, string(req.Email))
+	}
+
+	userResult := a.repo.GetAccount().GetByEmail(ctx, req.Email)
+	if userResult.Error != nil {
+		return nil, userResult.Error
+	}
+
+	if !helpers.ComparePasswords(userResult.Value.Password, []byte(req.Password)) {
+		return nil, errors.ErrInvalidAttributes("username and password")
+	}
+
+	roleResult := a.repo.GetRole().GetById(ctx, userResult.Value.RoleId)
+	if roleResult.Error != nil {
+		return nil, roleResult.Error
+	}
+
+	roleBuild := entities.NewRoleBuilder()
+	roleBuild.SetId(userResult.Value.RoleId)
+	roleBuild.SetName(roleResult.Value.Name)
+
+	userBuild := entities.NewAccountBuilder()
+	userBuild.SetId(userResult.Value.Id)
+	userBuild.SetEmail(userResult.Value.Email)
+	userBuild.SetRole(*roleBuild.Build())
+	userBuild.SetIsActive(*userResult.Value.IsActive)
+	userBuild.SetCreatedAt(userResult.Value.CreatedAt)
+	userBuild.SetCreatedBy(userResult.Value.CreatedBy)
+
+	clm := jwt.NewClaimsBuilder()
+	clm.User(userBuild.Build())
+
+	clm.ExpiresAt(time.Now().Add(5 * time.Minute))
+	token, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
+
+	if err != nil {
+		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
+	}
+
+	clm.ExpiresAt(time.Now().Add(2160 * time.Hour))
+	refreshToken, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
+	if err != nil {
+		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
+	}
+
+	mRefreshToken := models.NewRefershTokenBuilder()
+	mRefreshToken.SetId(helpers.GenerateUUIDV4(a.logs))
+	mRefreshToken.SetUserId(userResult.Value.Id)
+	mRefreshToken.SetToken(refreshToken)
+	mRefreshToken.SetCreatedAt(time.Now().Local().UTC())
+
+	if err = a.repo.GetRefreshToken().CreateRefershToken(ctx, mRefreshToken.Build()); err != nil {
+		return resBuild.Build(), err
+	}
+
+	resBuild.SetToken(token)
+	resBuild.SetRefreshToken(refreshToken)
+	return resBuild.Build(), nil
 }
 
 // CreateAccount implements AccountService
-func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.CreateAccount) (res *responses.EntityId, err error) {
+func (a *accountUseCase) CreateAccount(ctx context.Context, req *requests.CreateAccount) (res *responses.EntityId, err error) {
 	resBuilder := responses.NewEntityIdBuilder()
 	defaultStat := true
 
@@ -57,7 +128,7 @@ func (a *AccountUseCase) CreateAccount(ctx context.Context, req *requests.Create
 }
 
 // DeleteAccount implements AccountService
-func (a *AccountUseCase) DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
+func (a *accountUseCase) DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -69,7 +140,7 @@ func (a *AccountUseCase) DeleteAccount(ctx context.Context, req *requests.Entity
 }
 
 // DisableAccount implements AccountService
-func (a *AccountUseCase) DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error) {
+func (a *accountUseCase) DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error) {
 	uUid := uuid.FromStringOrNil(req.Id.(string))
 	result := a.repo.GetAccount().GetById(ctx, uUid)
 	if result.Error != nil {
@@ -83,7 +154,7 @@ func (a *AccountUseCase) DisableAccount(ctx context.Context, req *requests.Disab
 }
 
 // ListAccount implements AccountService
-func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
+func (a *accountUseCase) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
 	var (
 		accounteData []entities.Account
 		result       models.SliceResult[models.Account]
@@ -133,7 +204,7 @@ func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList
 }
 
 // ViewAccountByID implements AccountService
-func (a *AccountUseCase) ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error) {
+func (a *accountUseCase) ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error) {
 	if err = req.Validate(); err != nil {
 		return nil, err
 	}
@@ -159,9 +230,10 @@ func (a *AccountUseCase) ViewAccountByID(ctx context.Context, req *requests.Enti
 	return resBuild.SetData(mBuild.Build()).Build(), nil
 }
 
-func NewAccount(logs zap.Logger, r repositories.Repositories) AccountService {
-	a := new(AccountUseCase)
+func NewAccount(logs zap.Logger, jwtKey string, r repositories.Repositories) AccountService {
+	a := new(accountUseCase)
 	a.logs = logs
+	a.jwtKey = jwtKey
 	a.repo = r
 	return a
 }
