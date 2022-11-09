@@ -41,7 +41,7 @@ func (g *gormProvider) GetAll(ctx context.Context, limit int64) (result models.S
 
 // GetByEmail implements AccountRepository
 func (g *gormProvider) GetByEmail(ctx context.Context, email string) (result models.SingleResult[*models.Account]) {
-	result.Error = errors.ErrRecordNotFound(g.logs, g.GetModelName(), g.db.WithContext(ctx).First(&result.Value, email).Error)
+	result.Error = errors.ErrRecordNotFound(g.logs, g.GetModelName(), g.db.WithContext(ctx).Where("email = ?", email).First(&result.Value).Error)
 	return result
 }
 
