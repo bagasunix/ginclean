@@ -22,7 +22,6 @@ type AccountService interface {
 	ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error)
 	ViewAccountByEmail(ctx context.Context, email string) (res *responses.ViewEntity[*entities.Account], err error)
 	DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error)
-	DisableMultipleAccount(ctx context.Context, req []string) (res *responses.ListMultiple[*entities.Account, *entities.Account], err error)
 	DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
 }
 
@@ -84,11 +83,6 @@ func (a *AccountUseCase) DisableAccount(ctx context.Context, req *requests.Disab
 	return new(responses.Empty), a.repo.GetAccount().UpdateStatus(ctx, mBuild.Build())
 }
 
-// DisableMultipleAccount implements AccountService
-func (*AccountUseCase) DisableMultipleAccount(ctx context.Context, req []string) (res *responses.ListMultiple[*entities.Account, *entities.Account], err error) {
-	panic("unimplemented")
-}
-
 // ListAccount implements AccountService
 func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error) {
 	var (
@@ -145,8 +139,30 @@ func (*AccountUseCase) ViewAccountByEmail(ctx context.Context, email string) (re
 }
 
 // ViewAccountByID implements AccountService
-func (*AccountUseCase) ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error) {
-	panic("unimplemented")
+func (a *AccountUseCase) ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error) {
+	if err = req.Validate(); err != nil {
+		return nil, err
+	}
+
+	result := a.repo.GetAccount().GetById(ctx, req.Id.(uuid.UUID))
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	resRole := a.repo.GetRole().GetById(ctx, result.Value.RoleId)
+	roleBuild := entities.NewRoleBuilder()
+	roleBuild.SetId(resRole.Value.Id)
+	roleBuild.SetName(resRole.Value.Name)
+
+	mBuild := entities.NewAccountBuilder()
+	mBuild.SetId(result.Value.Id)
+	mBuild.SetEmail(result.Value.Email)
+	mBuild.SetRole(*roleBuild.Build())
+	mBuild.SetCreatedAt(result.Value.CreatedAt)
+	mBuild.SetCreatedBy(result.Value.CreatedBy)
+
+	resBuild := responses.NewViewEntityBuilder[*entities.Account]()
+	return resBuild.SetData(mBuild.Build()).Build(), nil
 }
 
 func NewAccount(logs zap.Logger, r repositories.Repositories) AccountService {
