@@ -10,6 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// LoginAccount implements domains.Service
+func (l *loggingMiddleware) LoginAccount(ctx context.Context, req *requests.SignInWithEmailPassword) (res *responses.SignIn, err error) {
+	defer func(begin time.Time) {
+		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "LoginUser"), zap.Any("request", string(req.ToJSON())), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
+	}(time.Now())
+	return l.next.LoginAccount(ctx, req)
+}
+
 // CreateAccount implements domains.Service
 func (l *loggingMiddleware) CreateAccount(ctx context.Context, req *requests.CreateAccount) (res *responses.EntityId, err error) {
 	defer func(begin time.Time) {
