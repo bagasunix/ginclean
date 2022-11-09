@@ -5,6 +5,7 @@ import (
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains/data/models"
+	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -12,6 +13,11 @@ import (
 type gormProvider struct {
 	db   *gorm.DB
 	logs zap.Logger
+}
+
+// Delete implements Repository
+func (g *gormProvider) Delete(ctx context.Context, userId uuid.UUID) error {
+	return errors.ErrSomethingWrong(g.logs, g.db.WithContext(ctx).Delete(models.NewRefershTokenBuilder().Build(), "user_id = ?", userId).Error)
 }
 
 // GetConnection implements Repository
@@ -25,7 +31,7 @@ func (g *gormProvider) GetModelName() string {
 }
 
 // CreateRefershToken implements Repository
-func (g *gormProvider) CreateRefershToken(ctx context.Context, m *models.RefershToken) error {
+func (g *gormProvider) Create(ctx context.Context, m *models.RefershToken) error {
 	return errors.ErrSomethingWrong(g.logs, g.db.WithContext(ctx).Create(m).Error)
 }
 
