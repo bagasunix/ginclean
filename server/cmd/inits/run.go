@@ -3,12 +3,11 @@ package inits
 import (
 	"context"
 	"flag"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	envs "github.com/bagasunix/ginclean/pkg/env"
 	"github.com/bagasunix/ginclean/server/domains/data/repositories"
@@ -21,44 +20,39 @@ var (
 func Run() {
 	flag.Parse()
 	ctx := context.Background()
-
 	logger := InitLogger()
+
+	// ************ Database ************
 	configs, _ := envs.LoadEnv()
 	db := InitDb(ctx, logger, configs)
 	Migrate(logger, db)
+
+	// ************ Service ************
 	repo := repositories.New(logger, db)
 	svc := InitService(logger, repo)
 	eps := InitEndpoints(logger, svc)
-
 	httpHandler := InitHttpHandler(&logger, eps)
 
+	// ************ Transport ************
+	errs := make(chan error)
+	go initCancel(errs)
+	go initHttp(httpHandler, errs)
+
+	logger.Sugar().Error("exit", <-errs)
+}
+
+func initCancel(errs chan error) {
+	// Wait for kill signal of channel
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	// This blocks until a signal is passed into the quit channel
+	errs <- fmt.Errorf("%s", <-quit)
+}
+
+func initHttp(httpHandler http.Handler, errs chan error) {
 	srv := &http.Server{
 		Addr:    *httpAddr,
 		Handler: httpHandler,
 	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to initialize server: %v\n", err)
-		}
-	}()
-
-	// Wait for kill signal of channel
-	quit := make(chan os.Signal)
-
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-	// This blocks until a signal is passed into the quit channel
-	<-quit
-
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// Shutdown server
-	log.Println("Shutting down server...")
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v\n", err)
-	}
+	errs <- srv.ListenAndServe()
 }
