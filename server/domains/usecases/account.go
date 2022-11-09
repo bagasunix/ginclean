@@ -20,7 +20,6 @@ type AccountService interface {
 	CreateAccount(ctx context.Context, req *requests.CreateAccount) (res *responses.EntityId, err error)
 	ListAccount(ctx context.Context, req *requests.BaseList) (res *responses.ListEntity[entities.Account], err error)
 	ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error)
-	ViewAccountByEmail(ctx context.Context, email string) (res *responses.ViewEntity[*entities.Account], err error)
 	DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error)
 	DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
 }
@@ -131,11 +130,6 @@ func (a *AccountUseCase) ListAccount(ctx context.Context, req *requests.BaseList
 	}
 	resBuilder.SetData(accounteData)
 	return resBuilder.Build(), result.Error
-}
-
-// ViewAccountByEmail implements AccountService
-func (*AccountUseCase) ViewAccountByEmail(ctx context.Context, email string) (res *responses.ViewEntity[*entities.Account], err error) {
-	panic("unimplemented")
 }
 
 // ViewAccountByID implements AccountService

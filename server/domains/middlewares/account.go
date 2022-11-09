@@ -42,14 +42,6 @@ func (l *loggingMiddleware) ListAccount(ctx context.Context, req *requests.BaseL
 	return l.next.ListAccount(ctx, req)
 }
 
-// ViewAccountByEmail implements domains.Service
-func (l *loggingMiddleware) ViewAccountByEmail(ctx context.Context, email string) (res *responses.ViewEntity[*entities.Account], err error) {
-	defer func(begin time.Time) {
-		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "ViewAccountByEmail"), zap.Any("request", string(email)), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
-	}(time.Now())
-	return l.next.ViewAccountByEmail(ctx, email)
-}
-
 // ViewAccountByID implements domains.Service
 func (l *loggingMiddleware) ViewAccountByID(ctx context.Context, req *requests.EntityId) (res *responses.ViewEntity[*entities.Account], err error) {
 	defer func(begin time.Time) {
