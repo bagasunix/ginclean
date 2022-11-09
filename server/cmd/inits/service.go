@@ -1,14 +1,15 @@
 package inits
 
 import (
+	envs "github.com/bagasunix/ginclean/pkg/env"
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/domains/data/repositories"
 	"github.com/bagasunix/ginclean/server/domains/middlewares"
 	"go.uber.org/zap"
 )
 
-func InitService(logs zap.Logger, repositories repositories.Repositories) domains.Service {
-	svc := domains.NewServiceBuilder(logs, repositories)
+func InitService(logs zap.Logger, conf *envs.Configs, repositories repositories.Repositories) domains.Service {
+	svc := domains.NewServiceBuilder(logs, conf.JwtSecret, repositories)
 	svc.SetMiddleware(getServiceMiddleware(logs))
 
 	return svc.Build()
