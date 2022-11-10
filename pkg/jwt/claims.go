@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/bagasunix/ginclean/server/domains/entities"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type Claims struct {
