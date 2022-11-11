@@ -19,5 +19,5 @@ func InitHttpHandler(logs *zap.Logger, endpoints endpoints.Endpoints) http.Handl
 	r.Use(middlewares.GinContextToContextMiddleware())
 	r.Use(middlewares.CORSMiddleware())
 
-	return transportHttp.NewHttpHandler(logs, r, endpoints)
+	return transportHttp.NewHttpHandler(r, endpoints)
 }
