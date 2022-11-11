@@ -208,6 +208,8 @@ func (r *RoleUseCase) ListRole(ctx context.Context, req *requests.BaseList) (res
 
 // CreateRole implements RoleService
 func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) (res *responses.EntityId, err error) {
+	payload := ctx.Value("authorization_payload").(entities.Account)
+	userID := uuid.FromStringOrNil(payload.Id.(string))
 	resBuild := responses.NewEntityIdBuilder()
 
 	if err = req.Validate(); err != nil {
@@ -217,6 +219,7 @@ func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) 
 	mRole.SetId(helpers.GenerateUUIDV1(r.logs))
 	mRole.SetName(req.Name)
 	mRole.SetCreatedAt(time.Now().UTC().Local())
+	mRole.SetCreatedBy(userID)
 
 	if err = r.repo.GetRole().Create(ctx, mRole.Build()); err != nil {
 		return resBuild.Build(), err
