@@ -14,7 +14,7 @@ func GenerateToken(jwtKey string, claims Claims) (token string, err error) {
 	return t.SignedString([]byte(jwtKey))
 }
 
-func ValidateToken(signedToken string) (err error) {
+func ValidateToken(signedToken string) (claims *Claims, err error) {
 	conf, _ := envs.LoadEnv()
 	t, err := jwt.ParseWithClaims(signedToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -38,5 +38,5 @@ func ValidateToken(signedToken string) (err error) {
 		return
 	}
 
-	return err
+	return claims, err
 }
