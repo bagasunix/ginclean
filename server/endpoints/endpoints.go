@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bagasunix/ginclean/server/domains"
+	"github.com/gin-gonic/gin"
 )
 
 type Endpoint func(ctx context.Context, req interface{}) (res interface{}, err error)
@@ -17,7 +18,8 @@ type Endpoints struct {
 // Builder Object for Endpoints
 type EndpointsBuilder struct {
 	service domains.Service
-	mdw     map[string][]Middleware
+	// mdw     map[string][]Middleware
+	mdw map[string]gin.HandlersChain
 }
 
 // Constructor for EndpointsBuilder
@@ -39,7 +41,7 @@ func (e *EndpointsBuilder) SetService(service domains.Service) {
 	e.service = service
 }
 
-// Setter method for the field mdw of type map[string][]Middleware in the object EndpointsBuilder
-func (e *EndpointsBuilder) SetMdw(mdw map[string][]Middleware) {
+// Setter method for the field mds of type gin.HandlerFunc in the object EndpointsBuilder
+func (e *EndpointsBuilder) SetMdw(mdw map[string]gin.HandlersChain) {
 	e.mdw = mdw
 }

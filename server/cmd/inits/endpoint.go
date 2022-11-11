@@ -4,6 +4,8 @@ import (
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/bagasunix/ginclean/server/endpoints"
 	"github.com/bagasunix/ginclean/server/endpoints/middlewares"
+	ginzap "github.com/gin-contrib/zap"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -14,25 +16,28 @@ func InitEndpoints(logs zap.Logger, svc domains.Service) endpoints.Endpoints {
 	return *a.Build()
 }
 
-func getEndpointMiddleware(logs zap.Logger) (mw map[string][]endpoints.Middleware) {
-	mw = map[string][]endpoints.Middleware{}
+func getEndpointMiddleware(logs zap.Logger) (mw map[string]gin.HandlersChain) {
+	mw = map[string]gin.HandlersChain{}
 	addDefaultEndpointMiddleware(logs, mw)
 	return mw
 }
 
-func middlewaresWithAuthentication(logs zap.Logger, method string) []endpoints.Middleware {
+func middlewaresWithAuthentication(logs zap.Logger, method string) gin.HandlersChain {
 	mw := defaultMiddlewares(logs, method)
+	// return mw
+	mw = append(mw, middlewares.CORSMiddleware())
+	mw = append(mw, middlewares.GinContextToContextMiddleware())
+	mw = append(mw, ginzap.RecoveryWithZap(&logs, true))
 	return mw
-	// return append(mw, middlewares.Authentication())
 }
 
-func defaultMiddlewares(logs zap.Logger, method string) []endpoints.Middleware {
-	return []endpoints.Middleware{
-		middlewares.Logging(*logs.With(zap.Any("method", method))),
+func defaultMiddlewares(logs zap.Logger, method string) gin.HandlersChain {
+	return gin.HandlersChain{
+		// middlewares.Logging(*logs.With(zap.Any("method", method))),
 	}
 }
 
-func addDefaultEndpointMiddleware(logs zap.Logger, mw map[string][]endpoints.Middleware) {
+func addDefaultEndpointMiddleware(logs zap.Logger, mw map[string]gin.HandlersChain) {
 	mw[endpoints.CREATE_ROLE] = middlewaresWithAuthentication(logs, endpoints.CREATE_ROLE)
 	mw[endpoints.LIST_ROLE] = middlewaresWithAuthentication(logs, endpoints.LIST_ROLE)
 	mw[endpoints.VIEW_ROLE] = middlewaresWithAuthentication(logs, endpoints.VIEW_ROLE)
