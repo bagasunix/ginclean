@@ -17,6 +17,7 @@ func GetTables() (tables []interface{}) {
 	tables = append(tables, models.NewCityBuilder().Build())
 	tables = append(tables, models.NewSubDistrictBuilder().Build())
 	tables = append(tables, models.NewVillageBuilder().Build())
+	tables = append(tables, models.NewResetPasswordBuilder().Build())
 	return tables
 }
 func Migrate(logs zap.Logger, db *gorm.DB) {
