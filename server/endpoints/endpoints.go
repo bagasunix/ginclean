@@ -1,14 +1,9 @@
 package endpoints
 
 import (
-	"context"
-
 	"github.com/bagasunix/ginclean/server/domains"
 	"github.com/gin-gonic/gin"
 )
-
-type Endpoint func(ctx context.Context, req interface{}) (res interface{}, err error)
-type Middleware func(Endpoint) Endpoint
 
 type Endpoints struct {
 	RoleEndpoint RoleEndpoint
