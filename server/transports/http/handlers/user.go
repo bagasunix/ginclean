@@ -9,9 +9,10 @@ import (
 func MakeUserHandler(eps endpoints.UserEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
 	rg.POST("", eps.CreateUser())
 	rg.POST("/login", eps.LoginAccount())
-	rg.GET("", middlewares.Auth(), middlewares.Permission("admin"), eps.ListAccount())
-	rg.GET("/:id", middlewares.Auth(), middlewares.Permission("admin"), eps.ViewAccount())
-	rg.DELETE("/:id", middlewares.Auth(), middlewares.Permission("admin"), eps.DeleteAccount())
-	rg.PUT("", middlewares.Auth(), middlewares.Permission("admin"), eps.DisableAccount())
+	rg.Use(middlewares.Auth(), middlewares.Permission("admin"))
+	rg.GET("", eps.ListAccount())
+	rg.GET("/:id", eps.ViewAccount())
+	rg.DELETE("/:id", eps.DeleteAccount())
+	rg.PUT("", eps.DisableAccount())
 	return rg
 }
