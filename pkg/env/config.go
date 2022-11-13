@@ -9,30 +9,35 @@ import (
 )
 
 type Configs struct {
-	Env             string
-	JwtSecret       string
-	DbDriver        string
-	DbHost          string
-	DbPort          string
-	DbName          string
-	DbUsername      string
-	DbPassword      string
-	SSLMode         string
-	Timezone        string
-	MaxIdleConns    string
-	MaxOpenConns    string
-	ConnMaxLifetime string
-	LogPath         string
-	LogName         string
-	LogMaxSize      string
-	LogMaxBackup    string
-	LogMaxAge       string
+	Env              string
+	JwtSecret        string
+	JwtSecretRefresh string
+	DbDriver         string
+	DbHost           string
+	DbPort           string
+	DbName           string
+	DbUsername       string
+	DbPassword       string
+	SSLMode          string
+	Timezone         string
+	MaxIdleConns     string
+	MaxOpenConns     string
+	ConnMaxLifetime  string
+	LogPath          string
+	LogName          string
+	LogMaxSize       string
+	LogMaxBackup     string
+	LogMaxAge        string
 }
 
 var env = map[string]map[string]string{
 	"ENV": {
 		"Key":          "Env",
 		"DefaultValue": "dev",
+	},
+	"JWT_SECRET_REFRESH": {
+		"Key":          "JwtSecretRefresh",
+		"DefaultValue": "GosNix",
 	},
 	"JWT_SECRET": {
 		"Key":          "JwtSecret",
