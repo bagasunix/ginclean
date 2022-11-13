@@ -36,21 +36,23 @@ type accountUseCase struct {
 
 // RefreshToken implements AccountService
 func (a *accountUseCase) RefreshToken(ctx context.Context, req *requests.Token) (res *responses.RefreshToken, err error) {
-	defaultStat := true
 	resBuilder := responses.NewRefreshTokenBuilder()
 	if req.Validate() != nil {
-		return resBuilder.Build(), nil
+		return resBuilder.Build(), req.Validate()
 	}
-	claims, err := jwt.ValidateRefreshToken(req.Token)
+	claims, err := jwt.ValidateRefreshToken(a.logs, req.Token)
 	if err != nil {
-		return resBuilder.Build(), errors.ErrSomethingWrong(a.logs, err)
+		return resBuilder.Build(), err
 	}
+	uUid := uuid.FromStringOrNil(claims.User.Id.(string))
 	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.CustomError("token expired")
-		return
+		if err = a.repo.GetRefreshToken().Delete(ctx, uUid); err != nil {
+			return resBuilder.Build(), err
+		}
+		return resBuilder.Build(), errors.CustomError("token expired")
 	}
 	resMail := a.repo.GetAccount().GetByEmail(ctx, claims.User.Email)
-	if resMail.Error != nil || resMail.Value.IsActive != &defaultStat {
+	if resMail.Error != nil || *resMail.Value.IsActive != true {
 		return resBuilder.Build(), errors.ErrSomethingWrong(a.logs, err)
 	}
 
@@ -120,7 +122,7 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
 	}
 
-	clm.ExpiresAt(time.Now().Add(2160 * time.Hour))
+	clm.ExpiresAt(time.Now().Add(168 * time.Hour))
 	refreshToken, err := jwt.GenerateToken(a.jwtKeyRefresh, *clm.Build())
 	if err != nil {
 		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
@@ -131,6 +133,7 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	mRefreshToken.SetUserId(userResult.Value.Id)
 	mRefreshToken.SetToken(refreshToken)
 	mRefreshToken.SetCreatedAt(time.Now().Local().UTC())
+	mRefreshToken.SetCreatedBy(userBuild.Build().Id.(uuid.UUID))
 
 	if err = a.repo.GetRefreshToken().Create(ctx, mRefreshToken.Build()); err != nil {
 		return resBuild.Build(), err
