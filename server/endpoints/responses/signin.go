@@ -48,3 +48,36 @@ func (s *SignInBuilder) SetRefreshToken(refreshToken string) *SignInBuilder {
 	s.refreshToken = refreshToken
 	return s
 }
+
+type RefreshToken struct {
+	Token string `json:"token"`
+}
+
+func (c *RefreshToken) ToJSON() []byte {
+	j, err := json.Marshal(c)
+	errors.HandlerReturnedVoid(err)
+	return j
+}
+
+// Builder Object for RefreshToken
+type RefreshTokenBuilder struct {
+	token string
+}
+
+// Constructor for RefreshTokenBuilder
+func NewRefreshTokenBuilder() *RefreshTokenBuilder {
+	o := new(RefreshTokenBuilder)
+	return o
+}
+
+// Build Method which creates RefreshToken
+func (b *RefreshTokenBuilder) Build() *RefreshToken {
+	o := new(RefreshToken)
+	o.Token = b.token
+	return o
+}
+
+// Setter method for the field token of type string in the object RefreshTokenBuilder
+func (r *RefreshTokenBuilder) SetToken(token string) {
+	r.token = token
+}
