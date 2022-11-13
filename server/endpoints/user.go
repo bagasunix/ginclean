@@ -28,7 +28,7 @@ type userHandler struct {
 func (u *userHandler) LoginAccount() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		var req requests.SignInWithEmailPassword
-		reqBuild := entities.NewCoordinateBuilder()
+		reqBuild := entities.NewClientBuilder()
 		reqBuild.SetIpClient(g.ClientIP())
 		reqBuild.SetUserAgent(g.Request.UserAgent())
 		g.Set("clients", reqBuild.Build())

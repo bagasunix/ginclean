@@ -56,7 +56,7 @@ func (a *accountUseCase) RefreshToken(ctx context.Context, req *requests.Token) 
 
 	clm := jwt.NewClaimsBuilder()
 	clm.User(claims.User)
-	clm.Coordinate(claims.Coordinate)
+	clm.Client(claims.Client)
 
 	clm.ExpiresAt(time.Now().Add(5 * time.Minute))
 	token, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
@@ -74,7 +74,7 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	if req.Validate() != nil {
 		return resBuild.Build(), req.Validate()
 	}
-	dataCleint := ctx.Value("clients").(*entities.Coordinate)
+	dataCleint := ctx.Value("clients").(*entities.Client)
 
 	if helpers.IsEmailValid(req.Email) == false {
 		return resBuild.Build(), errors.ErrValidEmail(a.logs, string(req.Email))
@@ -106,13 +106,13 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	userBuild.SetCreatedAt(userResult.Value.CreatedAt)
 	userBuild.SetCreatedBy(userResult.Value.CreatedBy)
 
-	cooBuild := entities.NewCoordinateBuilder()
+	cooBuild := entities.NewClientBuilder()
 	cooBuild.SetIpClient(dataCleint.IpClient)
 	cooBuild.SetUserAgent(dataCleint.UserAgent)
 
 	clm := jwt.NewClaimsBuilder()
 	clm.User(userBuild.Build())
-	clm.Coordinate(cooBuild.Build())
+	clm.Client(cooBuild.Build())
 
 	clm.ExpiresAt(time.Now().Add(5 * time.Minute))
 	token, err := jwt.GenerateToken(a.jwtKey, *clm.Build())

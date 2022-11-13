@@ -8,12 +8,18 @@ import (
 )
 
 type Claims struct {
-	User *entities.Account `json:"account,omitempty"`
+	User   *entities.Account `json:"account,omitempty"`
+	Client *entities.Client  `json:"client,omitempty"`
 	jwt.StandardClaims
 }
 
 type ClaimsBuilder struct {
 	claims *Claims
+}
+
+func (c *ClaimsBuilder) Client(client *entities.Client) *ClaimsBuilder {
+	c.claims.Client = client
+	return c
 }
 
 func (c *ClaimsBuilder) User(user *entities.Account) *ClaimsBuilder {
