@@ -28,3 +28,16 @@ func (s *SignInWithEmailPassword) ToJSON() []byte {
 type Token struct {
 	Token string
 }
+
+func (s *Token) Validate() error {
+	if validation.IsEmpty(s.Token) {
+		return errors.ErrInvalidAttributes("token invalid")
+	}
+	return nil
+}
+
+func (s *Token) ToJSON() []byte {
+	j, err := json.Marshal(s)
+	errors.HandlerReturnedVoid(err)
+	return j
+}
