@@ -10,6 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// RefreshToken implements domains.Service
+func (l *loggingMiddleware) RefreshToken(ctx context.Context, req *requests.Token) (res *responses.RefreshToken, err error) {
+	defer func(begin time.Time) {
+		l.logs.Log(zap.InfoLevel, "Middleware Domain", zap.String("method", "RefreshToken"), zap.Any("request", string(req.ToJSON())), zap.Any("response", string(res.ToJSON())), zap.Any("err", err), zap.Any("took", time.Since(begin)))
+	}(time.Now())
+	return l.next.RefreshToken(ctx, req)
+}
+
 // LoginAccount implements domains.Service
 func (l *loggingMiddleware) LoginAccount(ctx context.Context, req *requests.SignInWithEmailPassword) (res *responses.SignIn, err error) {
 	defer func(begin time.Time) {
