@@ -26,12 +26,12 @@ func (s *SignInWithEmailPassword) ToJSON() []byte {
 }
 
 type Token struct {
-	Token string
+	Token string `json:"token"`
 }
 
 func (s *Token) Validate() error {
 	if validation.IsEmpty(s.Token) {
-		return errors.ErrInvalidAttributes("token invalid")
+		return errors.ErrInvalidAttributes("token")
 	}
 	return nil
 }
@@ -40,4 +40,27 @@ func (s *Token) ToJSON() []byte {
 	j, err := json.Marshal(s)
 	errors.HandlerReturnedVoid(err)
 	return j
+}
+
+// Builder Object for Token
+type TokenBuilder struct {
+	token string
+}
+
+// Constructor for TokenBuilder
+func NewTokenBuilder() *TokenBuilder {
+	o := new(TokenBuilder)
+	return o
+}
+
+// Build Method which creates Token
+func (b *TokenBuilder) Build() *Token {
+	o := new(Token)
+	o.Token = b.token
+	return o
+}
+
+// Setter method for the field token of type string in the object TokenBuilder
+func (t *TokenBuilder) SetToken(token string) {
+	t.token = token
 }
