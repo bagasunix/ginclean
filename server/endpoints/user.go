@@ -5,6 +5,7 @@ import (
 
 	"github.com/bagasunix/ginclean/pkg/errors"
 	"github.com/bagasunix/ginclean/server/domains"
+	"github.com/bagasunix/ginclean/server/domains/entities"
 	"github.com/bagasunix/ginclean/server/endpoints/requests"
 	"github.com/bagasunix/ginclean/server/endpoints/utils"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,11 @@ type userHandler struct {
 func (u *userHandler) LoginAccount() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		var req requests.SignInWithEmailPassword
+		reqBuild := entities.NewCoordinateBuilder()
+		reqBuild.SetIpClient(g.ClientIP())
+		reqBuild.SetUserAgent(g.Request.UserAgent())
+		g.Set("clients", reqBuild.Build())
+
 		if err := g.Bind(&req); err != nil {
 			utils.EncodeError(g, err, g.Writer)
 			return
