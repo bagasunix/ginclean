@@ -9,7 +9,7 @@ import (
 )
 
 func InitService(logs zap.Logger, conf *envs.Configs, repositories repositories.Repositories) domains.Service {
-	svc := domains.NewServiceBuilder(logs, conf.JwtSecret, repositories)
+	svc := domains.NewServiceBuilder(logs, conf.JwtSecret, conf.JwtSecretRefresh, repositories)
 	svc.SetMiddleware(getServiceMiddleware(logs))
 
 	return svc.Build()

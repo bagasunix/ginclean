@@ -17,29 +17,31 @@ type service struct {
 }
 
 type ServiceBuilder struct {
-	logs       zap.Logger
-	repo       repositories.Repositories
-	middleware []Middleware
-	jwtKey     string
+	logs          zap.Logger
+	repo          repositories.Repositories
+	middleware    []Middleware
+	jwtKey        string
+	jwtKeyRefresh string
 }
 
-func NewServiceBuilder(logs zap.Logger, jwtKey string, repo repositories.Repositories) *ServiceBuilder {
+func NewServiceBuilder(logs zap.Logger, jwtKey string, jwtKeyRefresh string, repo repositories.Repositories) *ServiceBuilder {
 	s := new(ServiceBuilder)
 	s.jwtKey = jwtKey
+	s.jwtKeyRefresh = jwtKeyRefresh
 	s.logs = logs
 	s.repo = repo
 	return s
 }
 
-func buildService(logs zap.Logger, jwtKey string, repo repositories.Repositories) Service {
+func buildService(logs zap.Logger, jwtKey string, jwtKeyRefresh string, repo repositories.Repositories) Service {
 	svc := new(service)
 	svc.RoleService = usecases.NewRole(logs, repo)
-	svc.AccountService = usecases.NewAccount(logs, jwtKey, repo)
+	svc.AccountService = usecases.NewAccount(logs, jwtKey, jwtKeyRefresh, repo)
 	return svc
 }
 
 func (s *ServiceBuilder) Build() Service {
-	svc := buildService(s.logs, s.jwtKey, s.repo)
+	svc := buildService(s.logs, s.jwtKey, s.jwtKeyRefresh, s.repo)
 	for _, v := range s.middleware {
 		svc = v(svc)
 	}
