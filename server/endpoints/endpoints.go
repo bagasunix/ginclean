@@ -8,6 +8,7 @@ import (
 type Endpoints struct {
 	RoleEndpoint RoleEndpoint
 	UserEndpoint UserEndpoint
+	RefreshToken AuthEndpoint
 }
 
 // Builder Object for Endpoints
@@ -28,6 +29,7 @@ func (b *EndpointsBuilder) Build() *Endpoints {
 	o := new(Endpoints)
 	o.RoleEndpoint = NewRoleEndpoint(b.service)
 	o.UserEndpoint = NewUserEndpoint(b.service)
+	o.RefreshToken = NewAuthEndpoint(b.service)
 	return o
 }
 
