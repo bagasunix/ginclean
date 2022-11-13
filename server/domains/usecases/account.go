@@ -24,12 +24,48 @@ type AccountService interface {
 	DisableAccount(ctx context.Context, req *requests.DisableAccount) (res *responses.Empty, err error)
 	DeleteAccount(ctx context.Context, req *requests.EntityId) (res *responses.Empty, err error)
 	LoginAccount(ctx context.Context, req *requests.SignInWithEmailPassword) (res *responses.SignIn, err error)
+	RefreshToken(ctx context.Context, req *requests.Token) (res *responses.RefreshToken, err error)
 }
 
 type accountUseCase struct {
-	jwtKey string
-	logs   zap.Logger
-	repo   repositories.Repositories
+	jwtKey        string
+	jwtKeyRefresh string
+	logs          zap.Logger
+	repo          repositories.Repositories
+}
+
+// RefreshToken implements AccountService
+func (a *accountUseCase) RefreshToken(ctx context.Context, req *requests.Token) (res *responses.RefreshToken, err error) {
+	defaultStat := true
+	resBuilder := responses.NewRefreshTokenBuilder()
+	if req.Validate() != nil {
+		return resBuilder.Build(), nil
+	}
+	claims, err := jwt.ValidateRefreshToken(req.Token)
+	if err != nil {
+		return resBuilder.Build(), errors.ErrSomethingWrong(a.logs, err)
+	}
+	if claims.ExpiresAt < time.Now().Local().Unix() {
+		err = errors.CustomError("token expired")
+		return
+	}
+	resMail := a.repo.GetAccount().GetByEmail(ctx, claims.User.Email)
+	if resMail.Error != nil || resMail.Value.IsActive != &defaultStat {
+		return resBuilder.Build(), errors.ErrSomethingWrong(a.logs, err)
+	}
+
+	clm := jwt.NewClaimsBuilder()
+	clm.User(claims.User)
+	clm.Coordinate(claims.Coordinate)
+
+	clm.ExpiresAt(time.Now().Add(5 * time.Minute))
+	token, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
+	if err != nil {
+		return resBuilder.Build(), errors.ErrSomethingWrong(a.logs, err)
+	}
+
+	resBuilder.SetToken(token)
+	return resBuilder.Build(), nil
 }
 
 // LoginAccount implements AccountService
@@ -38,6 +74,7 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	if req.Validate() != nil {
 		return resBuild.Build(), req.Validate()
 	}
+	dataCleint := ctx.Value("clients").(*entities.Coordinate)
 
 	if helpers.IsEmailValid(req.Email) == false {
 		return resBuild.Build(), errors.ErrValidEmail(a.logs, string(req.Email))
@@ -69,18 +106,22 @@ func (a *accountUseCase) LoginAccount(ctx context.Context, req *requests.SignInW
 	userBuild.SetCreatedAt(userResult.Value.CreatedAt)
 	userBuild.SetCreatedBy(userResult.Value.CreatedBy)
 
+	cooBuild := entities.NewCoordinateBuilder()
+	cooBuild.SetIpClient(dataCleint.IpClient)
+	cooBuild.SetUserAgent(dataCleint.UserAgent)
+
 	clm := jwt.NewClaimsBuilder()
 	clm.User(userBuild.Build())
+	clm.Coordinate(cooBuild.Build())
 
 	clm.ExpiresAt(time.Now().Add(5 * time.Minute))
 	token, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
-
 	if err != nil {
 		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
 	}
 
 	clm.ExpiresAt(time.Now().Add(2160 * time.Hour))
-	refreshToken, err := jwt.GenerateToken(a.jwtKey, *clm.Build())
+	refreshToken, err := jwt.GenerateToken(a.jwtKeyRefresh, *clm.Build())
 	if err != nil {
 		return resBuild.Build(), errors.ErrSomethingWrong(a.logs, err)
 	}
@@ -230,10 +271,11 @@ func (a *accountUseCase) ViewAccountByID(ctx context.Context, req *requests.Enti
 	return resBuild.SetData(mBuild.Build()).Build(), nil
 }
 
-func NewAccount(logs zap.Logger, jwtKey string, r repositories.Repositories) AccountService {
+func NewAccount(logs zap.Logger, jwtKey string, jwtKeyRefresh string, r repositories.Repositories) AccountService {
 	a := new(accountUseCase)
 	a.logs = logs
 	a.jwtKey = jwtKey
+	a.jwtKeyRefresh = jwtKeyRefresh
 	a.repo = r
 	return a
 }
