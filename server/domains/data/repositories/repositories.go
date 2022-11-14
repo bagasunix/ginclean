@@ -35,7 +35,7 @@ func (r *repo) GetRole() role.Repository {
 	return r.role
 }
 
-func New(logs zap.Logger, db *gorm.DB) Repositories {
+func New(logs *zap.Logger, db *gorm.DB) Repositories {
 	rs := new(repo)
 	rs.role = role.NewGorm(logs, db)
 	rs.account = account.NewGorm(logs, db)

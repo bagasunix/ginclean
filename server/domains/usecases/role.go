@@ -26,7 +26,7 @@ type RoleService interface {
 }
 
 type RoleUseCase struct {
-	logs zap.Logger
+	logs *zap.Logger
 	repo repositories.Repositories
 }
 
@@ -228,7 +228,7 @@ func (r *RoleUseCase) CreateRole(ctx context.Context, req *requests.CreateRole) 
 	return resBuild.SetId(mRole.Build().Id).Build(), nil
 }
 
-func NewRole(logs zap.Logger, r repositories.Repositories) RoleService {
+func NewRole(logs *zap.Logger, r repositories.Repositories) RoleService {
 	u := new(RoleUseCase)
 	u.repo = r
 	u.logs = logs

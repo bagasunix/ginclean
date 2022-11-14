@@ -13,7 +13,7 @@ import (
 
 type gormProvider struct {
 	db   *gorm.DB
-	logs zap.Logger
+	logs *zap.Logger
 }
 
 // GetByKeywords implements Repository
@@ -66,7 +66,7 @@ func (g *gormProvider) GetModelName() string {
 	return "Account"
 }
 
-func NewGorm(logs zap.Logger, db *gorm.DB) Repository {
+func NewGorm(logs *zap.Logger, db *gorm.DB) Repository {
 	g := new(gormProvider)
 	g.logs = logs
 	g.db = db

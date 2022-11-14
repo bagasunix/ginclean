@@ -8,19 +8,19 @@ import (
 	"go.uber.org/zap"
 )
 
-func InitService(logs zap.Logger, conf *envs.Configs, repositories repositories.Repositories) domains.Service {
+func InitService(logs *zap.Logger, conf *envs.Configs, repositories repositories.Repositories) domains.Service {
 	svc := domains.NewServiceBuilder(logs, conf.JwtSecret, conf.JwtSecretRefresh, repositories)
 	svc.SetMiddleware(getServiceMiddleware(logs))
 
 	return svc.Build()
 }
 
-func getServiceMiddleware(logs zap.Logger) []domains.Middleware {
+func getServiceMiddleware(logs *zap.Logger) []domains.Middleware {
 	var mw []domains.Middleware
 	mw = addDefaultServiceMiddleware(logs, mw)
 	return mw
 }
 
-func addDefaultServiceMiddleware(logs zap.Logger, mw []domains.Middleware) []domains.Middleware {
+func addDefaultServiceMiddleware(logs *zap.Logger, mw []domains.Middleware) []domains.Middleware {
 	return append(mw, middlewares.LoggingMiddleware(logs))
 }

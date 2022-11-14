@@ -7,13 +7,13 @@ import (
 	"go.uber.org/zap"
 )
 
-func HandlerWithLoggerReturnedVoid(logger zap.Logger, err error, args ...interface{}) {
+func HandlerWithLoggerReturnedVoid(logger *zap.Logger, err error, args ...interface{}) {
 	if err == nil {
 		return
 	}
 	logger.Error(err.Error(), zap.Any("args:", args))
 }
-func HandlerWithOSExit(logger zap.Logger, err error, args ...interface{}) {
+func HandlerWithOSExit(logger *zap.Logger, err error, args ...interface{}) {
 	if err == nil {
 		return
 	}

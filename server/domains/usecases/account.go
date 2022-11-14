@@ -30,7 +30,7 @@ type AccountService interface {
 type accountUseCase struct {
 	jwtKey        string
 	jwtKeyRefresh string
-	logs          zap.Logger
+	logs          *zap.Logger
 	repo          repositories.Repositories
 }
 
@@ -274,7 +274,7 @@ func (a *accountUseCase) ViewAccountByID(ctx context.Context, req *requests.Enti
 	return resBuild.SetData(mBuild.Build()).Build(), nil
 }
 
-func NewAccount(logs zap.Logger, jwtKey string, jwtKeyRefresh string, r repositories.Repositories) AccountService {
+func NewAccount(logs *zap.Logger, jwtKey string, jwtKeyRefresh string, r repositories.Repositories) AccountService {
 	a := new(accountUseCase)
 	a.logs = logs
 	a.jwtKey = jwtKey

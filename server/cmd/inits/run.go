@@ -31,7 +31,7 @@ func Run() {
 	repo := repositories.New(logger, db)
 	svc := InitService(logger, configs, repo)
 	eps := InitEndpoints(logger, svc)
-	httpHandler := InitHttpHandler(&logger, eps)
+	httpHandler := InitHttpHandler(logger, eps)
 
 	// ************ Transport ************
 	errs := make(chan error)

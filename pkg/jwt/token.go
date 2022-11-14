@@ -15,7 +15,7 @@ func GenerateToken(jwtKey string, claims Claims) (token string, err error) {
 	return t.SignedString([]byte(jwtKey))
 }
 
-func ValidateToken(signedToken string) (claims *Claims, err error) {
+func ValidateToken(logs *zap.Logger, signedToken string) (claims *Claims, err error) {
 	conf, _ := envs.LoadEnv()
 	t, err := jwt.ParseWithClaims(signedToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -26,7 +26,7 @@ func ValidateToken(signedToken string) (claims *Claims, err error) {
 	})
 
 	if err != nil {
-		return
+		return nil, errors.ErrSomethingWrong(logs, err)
 	}
 
 	claims, ok := t.Claims.(*Claims)
@@ -43,7 +43,7 @@ func ValidateToken(signedToken string) (claims *Claims, err error) {
 	return claims, err
 }
 
-func ValidateRefreshToken(logs zap.Logger, signedToken string) (claims *Claims, err error) {
+func ValidateRefreshToken(logs *zap.Logger, signedToken string) (claims *Claims, err error) {
 	conf, _ := envs.LoadEnv()
 	t, _ := jwt.ParseWithClaims(signedToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

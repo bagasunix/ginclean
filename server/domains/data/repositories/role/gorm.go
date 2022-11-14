@@ -12,7 +12,7 @@ import (
 )
 
 type gormProvider struct {
-	logs zap.Logger
+	logs *zap.Logger
 	db   *gorm.DB
 }
 
@@ -60,7 +60,7 @@ func (g *gormProvider) Create(ctx context.Context, role *models.Role) error {
 	return errors.ErrDuplicateValue(g.logs, g.GetModelName(), g.db.WithContext(ctx).Create(role).Error)
 }
 
-func NewGorm(logs zap.Logger, db *gorm.DB) Repository {
+func NewGorm(logs *zap.Logger, db *gorm.DB) Repository {
 	g := new(gormProvider)
 	g.db = db
 	g.logs = logs

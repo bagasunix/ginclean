@@ -4,10 +4,11 @@ import (
 	"github.com/bagasunix/ginclean/server/endpoints"
 	"github.com/bagasunix/ginclean/server/endpoints/middlewares"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func MakeRoleHandler(eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
-	rg.Use(middlewares.Auth())
+func MakeRoleHandler(logs *zap.Logger, eps endpoints.RoleEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
+	rg.Use(middlewares.Auth(logs))
 	rg.Use(middlewares.Permission("admin"))
 	rg.POST("", eps.CreateRole())
 	rg.POST("/create-multiple-role", eps.CreateMultiRole())

@@ -24,7 +24,7 @@ func CustomError(err string) error {
 	return errors.New(err)
 }
 
-func ErrRecordNotFound(logger zap.Logger, entity string, err error) error {
+func ErrRecordNotFound(logger *zap.Logger, entity string, err error) error {
 	if err == nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func ErrRecordNotFound(logger zap.Logger, entity string, err error) error {
 	return ErrSomethingWrong(logger, err)
 }
 
-func ErrDuplicateValue(logger zap.Logger, entity string, err error) error {
+func ErrDuplicateValue(logger *zap.Logger, entity string, err error) error {
 	if err == nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func ErrDuplicateValue(logger zap.Logger, entity string, err error) error {
 	return ErrSomethingWrong(logger, err)
 }
 
-func ErrSomethingWrong(logger zap.Logger, err error) error {
+func ErrSomethingWrong(logger *zap.Logger, err error) error {
 	if err == nil {
 		return err
 	}
@@ -60,6 +60,6 @@ func ErrUnAuthorized() error {
 	return errors.New(ERR_NOT_AUTHORIZED)
 }
 
-func ErrValidEmail(logger zap.Logger, entity string) error {
+func ErrValidEmail(logger *zap.Logger, entity string) error {
 	return errors.New(fmt.Sprint(ERR_INVALID_EMAIL, " ", entity))
 }

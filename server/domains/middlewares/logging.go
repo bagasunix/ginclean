@@ -6,11 +6,11 @@ import (
 )
 
 type loggingMiddleware struct {
-	logs zap.Logger
+	logs *zap.Logger
 	next domains.Service
 }
 
-func LoggingMiddleware(logs zap.Logger) domains.Middleware {
+func LoggingMiddleware(logs *zap.Logger) domains.Middleware {
 	return func(next domains.Service) domains.Service {
 		return &loggingMiddleware{logs: logs, next: next}
 	}

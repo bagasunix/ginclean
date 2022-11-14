@@ -20,6 +20,6 @@ func GetTables() (tables []interface{}) {
 	tables = append(tables, models.NewResetPasswordBuilder().Build())
 	return tables
 }
-func Migrate(logs zap.Logger, db *gorm.DB) {
+func Migrate(logs *zap.Logger, db *gorm.DB) {
 	errors.HandlerWithOSExit(logs, db.AutoMigrate(GetTables()...), "AutoMigrate")
 }

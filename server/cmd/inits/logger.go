@@ -11,7 +11,7 @@ import (
 var lock = &sync.Mutex{}
 var Loggers *zap.Logger
 
-func InitLogger() zap.Logger {
+func InitLogger() *zap.Logger {
 	var core zapcore.Core
 
 	core = zapcore.NewTee(
@@ -20,7 +20,7 @@ func InitLogger() zap.Logger {
 
 	Loggers = zap.New(core, zap.AddCaller())
 
-	return *Loggers
+	return Loggers
 }
 
 func getConsoleEncoder() zapcore.Encoder {

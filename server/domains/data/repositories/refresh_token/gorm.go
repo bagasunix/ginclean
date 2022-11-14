@@ -12,7 +12,7 @@ import (
 
 type gormProvider struct {
 	db   *gorm.DB
-	logs zap.Logger
+	logs *zap.Logger
 }
 
 // Delete implements Repository
@@ -35,7 +35,7 @@ func (g *gormProvider) Create(ctx context.Context, m *models.RefershToken) error
 	return errors.ErrSomethingWrong(g.logs, g.db.WithContext(ctx).Create(m).Error)
 }
 
-func NewGorm(logs zap.Logger, db *gorm.DB) Repository {
+func NewGorm(logs *zap.Logger, db *gorm.DB) Repository {
 	g := new(gormProvider)
 	g.logs = logs
 	g.db = db

@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDb(ctx context.Context, logs zap.Logger, configs *envs.Configs) *gorm.DB {
+func InitDb(ctx context.Context, logs *zap.Logger, configs *envs.Configs) *gorm.DB {
 
 	MaxIdleConns, _ := strconv.Atoi(configs.MaxIdleConns)
 	MaxOpenConns, _ := strconv.Atoi(configs.MaxOpenConns)

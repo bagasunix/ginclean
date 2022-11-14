@@ -6,6 +6,7 @@ import (
 
 	"github.com/bagasunix/ginclean/pkg/jwt"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const (
@@ -14,7 +15,7 @@ const (
 	authorizationPayloadKey = "authorization_payload"
 )
 
-func Auth() gin.HandlerFunc {
+func Auth(logs *zap.Logger) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenString := context.GetHeader(authorizationHeaderKey)
 		if tokenString == "" {
@@ -37,7 +38,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := jwt.ValidateToken(fields[1])
+		claims, err := jwt.ValidateToken(logs, fields[1])
 		if err != nil {
 			context.JSON(401, gin.H{"error": err.Error()})
 			context.Abort()
