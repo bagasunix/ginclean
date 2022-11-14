@@ -33,6 +33,7 @@ func middlewaresWithAuthentication(logs zap.Logger, method string) gin.HandlersC
 
 func defaultMiddlewares(logs zap.Logger, method string) gin.HandlersChain {
 	return gin.HandlersChain{
+		middlewares.Loggings(*logs.With(zap.Any("method", method))),
 		// middlewares.Logging(*logs.With(zap.Any("method", method))),
 	}
 }
