@@ -20,10 +20,10 @@ var (
 func Run() {
 	flag.Parse()
 	ctx := context.Background()
-	logger := InitLogger()
+	configs, _ := envs.LoadEnv()
+	logger := InitLogger(configs)
 
 	// ************ Database ************
-	configs, _ := envs.LoadEnv()
 	db := InitDb(ctx, logger, configs)
 	Migrate(logger, db)
 
