@@ -23,3 +23,20 @@
 | /:id                  | PATCH  | Route used to update role          |
 | /update-multiple-role | PATCH  | Route used to update multiple role |
 | /:id                  | DELETE | Route used to delete role          |
+
+## API Role `/v1/user`
+
+| Route | HTTP   | Description                   |
+| ----- | ------ | ----------------------------- |
+| /     | POST   | Route used to create account  |
+| /     | GET    | Route used to list account    |
+| /:id  | GET    | Route used to view account    |
+| /:id  | DELETE | Route used to delete account  |
+| /:id  | PUT    | Route used to disable account |
+
+## API Role `/v1/auth`
+
+| Route          | HTTP | Description                      |
+| -------------- | ---- | -------------------------------- |
+| /refresh-token | POST | Route used to refresh token      |
+| /login         | POST | Route used to login account/user |
