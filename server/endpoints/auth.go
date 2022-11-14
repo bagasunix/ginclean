@@ -12,6 +12,7 @@ import (
 
 type AuthEndpoint interface {
 	RefreshToken() gin.HandlerFunc
+	LoginAccount() gin.HandlerFunc
 }
 
 type authHandler struct {
@@ -39,6 +40,29 @@ func (a *authHandler) RefreshToken() gin.HandlerFunc {
 
 		g.JSON(http.StatusCreated, dataToken)
 
+	}
+}
+
+// LoginAccount implements UserEndpoint
+func (u *authHandler) LoginAccount() gin.HandlerFunc {
+	return func(g *gin.Context) {
+		var req requests.SignInWithEmailPassword
+		reqBuild := entities.NewClientBuilder()
+		reqBuild.SetIpClient(g.ClientIP())
+		reqBuild.SetUserAgent(g.Request.UserAgent())
+		g.Set("clients", reqBuild.Build())
+
+		if err := g.Bind(&req); err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+		dataAccount, err := u.service.LoginAccount(g, &req)
+		if err != nil {
+			utils.EncodeError(g, err, g.Writer)
+			return
+		}
+
+		g.JSON(http.StatusCreated, dataAccount)
 	}
 }
 

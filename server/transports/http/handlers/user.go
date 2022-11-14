@@ -8,7 +8,6 @@ import (
 
 func MakeUserHandler(eps endpoints.UserEndpoint, rg *gin.RouterGroup) *gin.RouterGroup {
 	rg.POST("", eps.CreateUser())
-	rg.POST("/login", eps.LoginAccount())
 	rg.Use(middlewares.Auth(), middlewares.Permission("admin"))
 	rg.GET("", eps.ListAccount())
 	rg.GET("/:id", eps.ViewAccount())
